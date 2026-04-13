@@ -11,18 +11,23 @@ if __package__ is None or __package__ == "":
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from reelaigen.llm.integration import get_mistral_llm
+from reelaigen.llm.prompts import CONTENT_ANALYZER_PROMPT
 
 
 class SectionBoundary(BaseModel):
-    title: str = Field(..., description="Section title or best short label.")
-    start_text: str = Field(..., description="The first important line or snippet for this section.")
+    start_text: str = Field(..., description="Short snippet where the section starts.")
+    end_text: str = Field(..., description="Short snippet where the section ends.")
+
+
+class ContentSection(BaseModel):
+    section_id: int = Field(..., description="Section index starting from 0.")
+    section_boundary: SectionBoundary
+    target: str = Field(..., description="Main idea of the section.")
 
 
 class ContentAnalysis(BaseModel):
-    content_type: str = Field(..., description="High-level document type like math, CS, finance, physics, or biology.")
-    difficulty: str = Field(..., description="Difficulty level such as beginner, intermediate, or advanced.")
-    key_concepts: list[str] = Field(default_factory=list, description="Main concepts covered in the document.")
-    section_boundaries: list[SectionBoundary] = Field(default_factory=list, description="Main section starts in reading order.")
+    parent_content_type: str = Field(..., description="Main document type such as math_explainer, cs_explainer, finance, or general_education.")
+    sections: list[ContentSection] = Field(default_factory=list)
 
 
 @dataclass
@@ -43,11 +48,11 @@ class ContentParser:
             [
                 (
                     "system",
-                    "You analyze PDF text. Return only: content type, difficulty, key concepts, and section boundaries.",
+                    CONTENT_ANALYZER_PROMPT
                 ),
                 (
                     "human",
-                    "Analyze this document text:\n\n{document_text}",
+                    "{document_text}",
                 ),
             ]
         )
@@ -57,23 +62,3 @@ class ContentParser:
         return structured_llm.invoke(messages)
 
 
-if __name__ == "__main__":
-    sample_text = """
-    Attention Is All You Need
-
-    This paper introduces the Transformer architecture for sequence modeling.
-    It removes recurrence and relies entirely on attention mechanisms.
-
-    1. Introduction
-    Neural machine translation has traditionally used recurrent networks.
-
-    2. Model Architecture
-    The Transformer uses multi-head self-attention and positional encoding.
-
-    3. Results
-    The model achieves strong performance on translation benchmarks.
-    """
-
-    content = ContentParser()
-    response = content.run(sample_text)
-    print(response.model_dump_json(indent=2))

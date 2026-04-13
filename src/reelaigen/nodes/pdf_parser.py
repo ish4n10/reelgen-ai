@@ -9,7 +9,6 @@ from reelaigen.tools.pdf import read_pdf_metadata, read_pdf_text, save_pdf_pages
 
 @dataclass
 class PDFParserConfig:
-    max_pages: int | None = None
     save_page_images: bool = False
     image_dir: Path | None = None
     image_scale: float = 2.0
@@ -27,7 +26,7 @@ class PDFParser:
         if pdf_path.suffix.lower() != ".pdf":
             raise PDFParseError(f"Expected a PDF file: {pdf_path}")
 
-        page_texts = read_pdf_text(pdf_path, self.config.max_pages)
+        page_texts = read_pdf_text(pdf_path)
         metadata = read_pdf_metadata(pdf_path)
 
         image_paths: list[Path | None] = [None] * len(page_texts)
@@ -36,8 +35,7 @@ class PDFParser:
             saved_images = save_pdf_pages_as_images(
                 pdf_path,
                 output_dir=output_dir,
-                max_pages=self.config.max_pages,
-                scale=self.config.image_scale,
+                image_scale=self.config.image_scale,
             )
             for i, image_path in enumerate(saved_images):
                 if i < len(image_paths):
@@ -47,6 +45,9 @@ class PDFParser:
             PDFPage(number=i + 1, text=text, image_path=image_paths[i])
             for i, text in enumerate(page_texts)
         ]
-        full_text = "\n\n".join(page.text for page in pages)
 
-        return PDFParseResult(text=full_text, pages=pages, metadata=metadata)
+        return PDFParseResult(
+            text="\n\n".join(page.text for page in pages),
+            pages=pages,
+            metadata=metadata,
+        )

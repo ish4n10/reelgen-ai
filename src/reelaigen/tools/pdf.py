@@ -42,21 +42,18 @@ def save_embedded_images(
 def save_pdf_pages_as_images(
     pdf_path: str | Path,
     output_dir: str | Path,
-    max_pages: int | None = None,
-    scale: float = 2.0,
+    image_scale: float = 2.0,
 ) -> list[Path]:
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     document = pdfium.PdfDocument(str(pdf_path))
-    total_pages = len(document)
-    page_count = min(total_pages, max_pages) if max_pages else total_pages
     saved_paths: list[Path] = []
 
     try:
-        for index in range(page_count):
+        for index in range(len(document)):
             page = document[index]
-            bitmap = page.render(scale=scale)
+            bitmap = page.render(scale=image_scale)
             image_path = output_dir / f"page_{index + 1:04d}.png"
             try:
                 bitmap.to_pil().save(image_path)

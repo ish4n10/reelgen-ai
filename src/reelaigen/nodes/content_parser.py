@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import sys
+from typing import Any
 
 from langchain_core.messages import SystemMessage
 from pydantic import BaseModel, Field
@@ -20,10 +21,16 @@ class SectionBoundary(BaseModel):
     end_text: str = Field(..., description="Short snippet where the section ends.")
 
 
+class SectionImage(BaseModel):
+    image_id: str = Field(..., description="Image id like image_1.")
+    explanation: str = Field(..., description="Short explanation of what the image shows.")
+
+
 class ContentSection(BaseModel):
     section_id: int = Field(..., description="Section index starting from 0.")
     section_boundary: SectionBoundary
     target: str = Field(..., description="Main idea of the section.")
+    images: list[SectionImage] = Field(default_factory=list, description="Images used by this section.")
 
 
 class ContentAnalysis(BaseModel):
@@ -41,7 +48,7 @@ class ContentParser:
         self.llm = llm or get_mistral_llm()
         self.config = config or ContentParserConfig()
 
-    def run(self, document_text: str, images: list[str | Path] | None = None) -> ContentAnalysis:
+    def run(self, document_text: str, images: list[Any] | None = None) -> ContentAnalysis:
         if not document_text.strip():
             raise ValueError("document_text is empty")
 
@@ -51,4 +58,3 @@ class ContentParser:
             build_multimodal_message(document_text[: self.config.max_chars], images),
         ]
         return structured_llm.invoke(messages)
-

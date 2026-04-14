@@ -29,9 +29,8 @@ class ContentParserTests(unittest.TestCase):
                 )
             )
             pdf_result = pdf_parser.run(SAMPLE_PDF_PATH)
-            image_paths = [page.image_path for page in pdf_result.pages if page.image_path is not None]
-            text_chunk = pdf_result.text[: max(1, len(pdf_result.text) // 9)]
-            image_chunk = image_paths[:1] if image_paths else []
+            text_chunk = pdf_result.text[: max(1, len(pdf_result.text) // 6)]
+            image_chunk = [page for page in pdf_result.pages if page.image_path is not None][:1]
 
             content_parser = ContentParser()
             result = content_parser.run(text_chunk, images=image_chunk)

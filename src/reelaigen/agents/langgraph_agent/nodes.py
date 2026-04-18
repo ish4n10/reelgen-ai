@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from reelaigen.nodes.content_parser import ContentAnalysis, ContentParser
 from reelaigen.nodes.pdf_parser import PDFParser
-from reelaigen.nodes.script_writer import ScriptWriter
+from reelaigen.nodes.script_writer import ScriptPlan, ScriptWriter
+from reelaigen.nodes.visual_planner import VisualPlanner
 
 from .memory import add_memory_event, create_initial_context, create_initial_memory, update_context
 from .state import PDFContentAgentState
@@ -14,11 +15,13 @@ class GraphNodes:
         pdf_parser: PDFParser,
         content_parser: ContentParser,
         script_writer: ScriptWriter,
+        visual_planner: VisualPlanner,
         algorithm_parser=None,
     ) -> None:
         self.pdf_parser = pdf_parser
         self.content_parser = content_parser
         self.script_writer = script_writer
+        self.visual_planner = visual_planner
         self.algorithm_parser = algorithm_parser
 
     def initialize(self, state: PDFContentAgentState) -> dict:
@@ -100,17 +103,52 @@ class GraphNodes:
             "script_plan": result.model_dump(),
         }
 
+    def visual_planner_node(self, state: PDFContentAgentState) -> dict:
+        content_analysis = ContentAnalysis.model_validate(state["content_analysis"])
+        script_plan = ScriptPlan.model_validate(state["script_plan"])
+
+        result = self.visual_planner.run(
+            document_text=state["parsed_pdf"]["text"],
+            sections=content_analysis.sections,
+            script_sections=script_plan.sections,
+            pages=state["parsed_pdf"]["pages"],
+        )
+        return {
+            "context": update_context(state, "visual_planner"),
+            "memory": add_memory_event(
+                state,
+                "visual_planner",
+                f"Planned visuals for {len(result.sections)} sections.",
+            ),
+            "visual_plan": result.model_dump(),
+        }
+
     def summary(self, state: PDFContentAgentState) -> dict:
+        final_sections = []
+        script_sections = state.get("script_plan", {}).get("sections", [])
+        visual_sections = state.get("visual_plan", {}).get("sections", [])
+
+        for script_section in script_sections:
+            section_id = script_section["section_id"]
+            visual_section = self._find_section_by_id(visual_sections, section_id)
+            final_sections.append(
+                {
+                    "sectionId": section_id,
+                    "script": script_section,
+                    "visual": visual_section or {},
+                }
+            )
+
         return {
             "context": update_context(state, "summary"),
             "memory": add_memory_event(state, "summary", "Prepared final pipeline output."),
             "final_output": {
-                "user_prompt": state.get("user_prompt", {}),
-                "memory": state.get("memory", {}),
-                "context": state.get("context", {}),
-                "parsed_pdf": state["parsed_pdf"],
-                # "algorithm_analysis": state["algorithm_analysis"],
-                "content_analysis": state["content_analysis"],
-                "script_plan": state["script_plan"],
+                "sections": final_sections,
             },
         }
+
+    def _find_section_by_id(self, sections: list[dict], section_id: int) -> dict | None:
+        for section in sections:
+            if section.get("section_id") == section_id:
+                return section
+        return None

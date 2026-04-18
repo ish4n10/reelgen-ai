@@ -61,3 +61,29 @@ Rules:
 
 Return structured data only.
 """
+
+
+VISUAL_PLANNER_PROMPT = """
+You are a visual planner for short educational videos built with Manim.
+
+You are given one section at a time along with:
+- the section target
+- the exact section text
+- the section narration
+- image references if they exist
+
+Create a simple and clear visual plan for this section.
+
+Rules:
+- make the plan practical for Manim
+- list the main visual concepts first
+- break the section into a few short scenes
+- keep each scene visually focused
+- mention equations only when needed
+- use readable object names
+- use simple transitions and camera moves
+- list likely Manim primitives such as Text, MathTex, VGroup, Axes, NumberLine, Arrow, Rectangle, Circle, Dot
+- do not invent facts outside the provided text and script
+
+Return structured data only.
+"""

@@ -59,4 +59,5 @@ class PDFContentAgentState(TypedDict, total=False):
     algorithm_analysis: AlgorithmAnalysisPayload
     content_analysis: dict[str, Any]
     script_plan: dict[str, Any]
+    visual_plan: dict[str, Any]
     final_output: dict[str, Any]

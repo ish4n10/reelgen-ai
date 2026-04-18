@@ -2,6 +2,7 @@ from .algorithm_parser import AlgorithmAnalysis, AlgorithmParser, AlgorithmParse
 from .content_parser import ContentAnalysis, ContentParser, ContentParserConfig, ContentSection, SectionBoundary
 from .pdf_parser import PDFParser, PDFParserConfig
 from .script_writer import ScriptPlan, ScriptSectionOutput, ScriptTimingBeat, ScriptWriter, ScriptWriterConfig
+from .visual_planner import VisualPlan, VisualPlanner, VisualPlannerConfig, VisualScene, VisualSectionPlan
 
 __all__ = [
     "AlgorithmAnalysis",
@@ -20,4 +21,9 @@ __all__ = [
     "ScriptTimingBeat",
     "ScriptWriter",
     "ScriptWriterConfig",
+    "VisualPlan",
+    "VisualPlanner",
+    "VisualPlannerConfig",
+    "VisualScene",
+    "VisualSectionPlan",
 ]

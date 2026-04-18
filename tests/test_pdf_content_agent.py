@@ -14,6 +14,7 @@ from reelaigen.agents.langgraph_agent import ReelAIGraphAgent
 from reelaigen.nodes.content_parser import ContentParser
 from reelaigen.nodes.pdf_parser import PDFParser, PDFParserConfig
 from reelaigen.nodes.script_writer import ScriptWriter
+from reelaigen.nodes.visual_planner import VisualPlanner
 
 HAS_LANGGRAPH = importlib.util.find_spec("langgraph") is not None
 HAS_MISTRAL = importlib.util.find_spec("langchain_mistralai") is not None
@@ -36,6 +37,7 @@ class PDFContentAgentTests(unittest.TestCase):
                 pdf_parser=PDFParser(PDFParserConfig(save_page_images=True, image_dir=Path(tmp_dir) / "pages")),
                 content_parser=ContentParser(),
                 script_writer=ScriptWriter(),
+                visual_planner=VisualPlanner(),
             )
             app = agent.build()
             graph = app.get_graph()
@@ -71,16 +73,13 @@ class PDFContentAgentTests(unittest.TestCase):
         print("\nFinal agent output:")
         print(json.dumps(result["final_output"], indent=2, ensure_ascii=False))
 
-        self.assertIn("parsed_pdf", result["final_output"])
-        self.assertIn("content_analysis", result["final_output"])
-        self.assertIn("script_plan", result["final_output"])
-        self.assertIn("user_prompt", result["final_output"])
-        self.assertIn("memory", result["final_output"])
-        self.assertIn("context", result["final_output"])
-        self.assertTrue(result["final_output"]["content_analysis"]["parent_content_type"].strip())
-        self.assertGreaterEqual(len(result["final_output"]["content_analysis"]["sections"]), 1)
-        self.assertGreaterEqual(len(result["final_output"]["script_plan"]["sections"]), 1)
-        self.assertTrue(result["final_output"]["script_plan"]["sections"][0]["narration"].strip())
+        self.assertIn("sections", result["final_output"])
+        self.assertGreaterEqual(len(result["final_output"]["sections"]), 1)
+        self.assertIn("sectionId", result["final_output"]["sections"][0])
+        self.assertIn("script", result["final_output"]["sections"][0])
+        self.assertIn("visual", result["final_output"]["sections"][0])
+        self.assertTrue(result["final_output"]["sections"][0]["script"]["narration"].strip())
+        self.assertGreaterEqual(len(result["final_output"]["sections"][0]["visual"].get("scenes", [])), 1)
 
 
 if __name__ == "__main__":

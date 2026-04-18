@@ -12,9 +12,10 @@ if __package__ is None or __package__ == "":
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from reelaigen.llm.integration import build_multimodal_message
-from reelaigen.llm.integration import get_mistral_llm, get_llm
+from reelaigen.llm.integration import get_llm
 from reelaigen.llm.prompts import SCRIPT_WRITER_PROMPT
 from reelaigen.nodes.content_parser import ContentSection
+from reelaigen.nodes.section_utils import collect_section_images, extract_section_text
 
 
 class ScriptTimingBeat(BaseModel):
@@ -58,13 +59,14 @@ class ScriptWriter:
         results: list[ScriptSectionOutput] = []
 
         for section in sections:
-            section_text = self._extract_section_text(
+            section_text = extract_section_text(
                 document_text,
                 section.section_boundary.start_text,
                 section.section_boundary.end_text,
+                self.config.max_chars,
             )
             prompt_text = self._build_section_prompt_text(section, section_text, algorithm_context)
-            section_images = self._collect_section_images(section, pages or [])
+            section_images = collect_section_images(section, pages or [])
 
             structured_llm = self.llm.with_structured_output(ScriptSectionOutput, method="json_schema")
             messages = [
@@ -75,26 +77,6 @@ class ScriptWriter:
             results.append(result)
 
         return ScriptPlan(sections=results)
-
-    def _extract_section_text(self, document_text: str, start_text: str, end_text: str) -> str:
-        start_index = document_text.find(start_text)
-        if start_index == -1:
-            start_index = 0
-
-        end_index = document_text.find(end_text, start_index + len(start_text))
-        if end_index == -1:
-            end_index = len(document_text)
-        else:
-            end_index += len(end_text)
-
-        extracted = document_text[start_index:end_index].strip()
-        return extracted or document_text[: self.config.max_chars].strip()
-
-    def _collect_section_images(self, section: ContentSection, pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        wanted_ids = {image.image_id for image in section.images}
-        if not wanted_ids:
-            return []
-        return [page for page in pages if page.get("image_id") in wanted_ids and page.get("image_path")]
 
     def _build_section_prompt_text(
         self,

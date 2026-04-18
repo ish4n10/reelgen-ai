@@ -7,6 +7,7 @@ from reelaigen.nodes.algorithm_parser import AlgorithmParser
 from reelaigen.nodes.content_parser import ContentParser
 from reelaigen.nodes.pdf_parser import PDFParser, PDFParserConfig
 from reelaigen.nodes.script_writer import ScriptWriter
+from reelaigen.nodes.visual_planner import VisualPlanner
 
 from .graph import build_graph
 from .nodes import GraphNodes
@@ -19,17 +20,20 @@ class ReelAIGraphAgent:
         algorithm_parser: AlgorithmParser | None = None,
         content_parser: ContentParser | None = None,
         script_writer: ScriptWriter | None = None,
+        visual_planner: VisualPlanner | None = None,
     ) -> None:
         self.pdf_parser = pdf_parser or PDFParser(PDFParserConfig(save_page_images=True))
         self.algorithm_parser = algorithm_parser or AlgorithmParser()
         self.content_parser = content_parser or ContentParser()
         self.script_writer = script_writer or ScriptWriter()
+        self.visual_planner = visual_planner or VisualPlanner()
 
-    def build(self): 
+    def build(self):
         nodes = GraphNodes(
             pdf_parser=self.pdf_parser,
             content_parser=self.content_parser,
             script_writer=self.script_writer,
+            visual_planner=self.visual_planner,
             algorithm_parser=self.algorithm_parser,
         )
         return build_graph(nodes)

@@ -1,126 +1,641 @@
 {
-    "sections": [
-      {
+  "sections": [
+    {
+      "sectionId": 0,
+      "script": {
         "section_id": 0,
-        "target": "Scaled Dot-Product Attention mechanism",
-        "section_text": "Scaled Dot-Product Attention\nMulti-Head Attention\nFigure 2: (left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel.\nquery with all keys, divide each by √dk, and apply a softmax function to obtain the weights on the values.\nIn practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix Q. The keys and values are also packed together into matrices K and V. We compute the matrix of outputs as:\nAttention(Q, K, V) = softmax(QKT / √dk)V (1)\nThe two most commonly used attention functions are additive attention [2], and dot-product (multiplicative) attention. Dot-product attention is identical to our algorithm, except for the scaling factor of 1/√dk. Additive attention computes the compatibility function using a feed-forward network with a single hidden layer. While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.",
-        "narration": "Let's explore the Scaled Dot-Product Attention mechanism. This diagram illustrates how it works. The process involves taking the dot product of the query with all keys, dividing each by the square root of dk, and applying a softmax function to obtain the weights on the values. In practice, this attention function is computed on a set of queries simultaneously, packed into a matrix Q, with keys and values packed into matrices K and V. The output is calculated as shown in the equation: Attention(Q, K, V) equals softmax of (QK transpose divided by the square root of dk) times V. Dot-product attention, which is identical to this algorithm except for a scaling factor, is faster and more space-efficient than additive attention, as it leverages optimized matrix multiplication code.",
-        "approx_duration_seconds": 45,
-        "min_duration_seconds": 40,
-        "max_duration_seconds": 50,
+        "target": "Introduction to Scaled Dot-Product Attention",
+        "section_text": "Scaled Dot-Product Attention Multi-Head Attention Figure 2: (left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel. query with all keys, divide each by √dk, and apply a softmax function to obtain the weights on the values.",
+        "narration": "In this section, we introduce the concept of Scaled Dot-Product Attention. As shown in the diagram, this mechanism involves querying with all keys, dividing each by the square root of dk, and applying a softmax function to obtain the weights on the values. This process is fundamental to understanding how attention mechanisms work in transformers.",
+        "approx_duration_seconds": 20,
+        "min_duration_seconds": 15,
+        "max_duration_seconds": 25,
         "timing_estimate": [
           {
             "start_second": 0.0,
-            "end_second": 8.0,
-            "note": "Introduction to Scaled Dot-Product Attention mechanism."
+            "end_second": 5.0,
+            "note": "In this section, we introduce the concept of Scaled Dot-Product Attention."       
           },
           {
-            "start_second": 8.0,
+            "start_second": 5.0,
+            "end_second": 10.0,
+            "note": "As shown in the diagram, this mechanism involves querying with all keys,"
+          },
+          {
+            "start_second": 10.0,
             "end_second": 15.0,
-            "note": "Explanation of the diagram and the process of taking the dot product of the query with all keys."
+            "note": "dividing each by the square root of dk,"
           },
           {
             "start_second": 15.0,
+            "end_second": 20.0,
+            "note": "and applying a softmax function to obtain the weights on the values."
+          },
+          {
+            "start_second": 20.0,
             "end_second": 25.0,
-            "note": "Description of dividing by the square root of dk and applying the softmax function."     
-          },
-          {
-            "start_second": 25.0,
-            "end_second": 35.0,
-            "note": "Explanation of computing the attention function on a set of queries simultaneously."     
-          },
-          {
-            "start_second": 35.0,
-            "end_second": 45.0,
-            "note": "Comparison of dot-product attention and additive attention, highlighting the efficiency of dot-product attention."
+            "note": "This process is fundamental to understanding how attention mechanisms work in transformers."
           }
         ]
       },
-      {
+      "visual": {
+        "section_id": 0,
+        "target": "Introduction to Scaled Dot-Product Attention",
+        "concepts": [
+          "Scaled Dot-Product Attention",
+          "Query, Key, Value matrices",
+          "Softmax function",
+          "Weights calculation"
+        ],
+        "scenes": [
+          {
+            "scene_id": 0,
+            "storyboard": "Introduction to Scaled Dot-Product Attention mechanism.",
+            "objects": [
+              "Title text: Scaled Dot-Product Attention",
+              "Diagram of Scaled Dot-Product Attention"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in the title text",
+              "Slide in the diagram from the left"
+            ],
+            "camera_moves": [
+              "Zoom in slightly on the diagram"
+            ],
+            "manim_primitives": [
+              "Text",
+              "ImageMobject"
+            ]
+          },
+          {
+            "scene_id": 1,
+            "storyboard": "Explanation of the query, key, and value matrices.",
+            "objects": [
+              "Query matrix (Q)",
+              "Key matrix (K)",
+              "Value matrix (V)",
+              "Arrows indicating interaction"
+            ],
+            "equations": [],
+            "transitions": [
+              "Highlight each matrix one by one"
+            ],
+            "camera_moves": [
+              "Pan across the matrices"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Rectangle",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Process of dividing by the square root of dk and applying the softmax function.",
+            "objects": [
+              "Mathematical expression: divide by √dk",
+              "Softmax function visualization",
+              "Weights on values"
+            ],
+            "equations": [
+              "√dk",
+              "Softmax function"
+            ],
+            "transitions": [
+              "Fade in the mathematical expression",
+              "Animate the softmax function application"
+            ],
+            "camera_moves": [
+              "Zoom in on the mathematical expression"
+            ],
+            "manim_primitives": [
+              "MathTex",
+              "Text",
+              "Circle"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "sectionId": 1,
+      "script": {
         "section_id": 1,
-        "target": "Scaling factor in dot-product attention",
+        "target": "Computing attention function on matrices",
+        "section_text": "In practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix Q. The keys and values are also packed together into matrices K and V. We compute the matrix of outputs as:",
+        "narration": "In practice, we compute the attention function on multiple queries at once. These queries are packed together into a matrix Q. Similarly, the keys and values are packed into matrices K and V. This allows us to compute the matrix of outputs efficiently.",
+        "approx_duration_seconds": 15,
+        "min_duration_seconds": 12,
+        "max_duration_seconds": 18,
+        "timing_estimate": [
+          {
+            "start_second": 0.0,
+            "end_second": 4.0,
+            "note": "In practice, we compute the attention function on multiple queries at once."      
+          },
+          {
+            "start_second": 4.0,
+            "end_second": 8.0,
+            "note": "These queries are packed together into a matrix Q."
+          },
+          {
+            "start_second": 8.0,
+            "end_second": 12.0,
+            "note": "Similarly, the keys and values are packed into matrices K and V."
+          },
+          {
+            "start_second": 12.0,
+            "end_second": 15.0,
+            "note": "This allows us to compute the matrix of outputs efficiently."
+          }
+        ]
+      },
+      "visual": {
+        "section_id": 1,
+        "target": "Computing attention function on matrices",
+        "concepts": [
+          "Matrix Q (Queries)",
+          "Matrix K (Keys)",
+          "Matrix V (Values)",
+          "Attention function computation"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to matrices Q, K, and V.",
+            "objects": [
+              "Matrix Q",
+              "Matrix K",
+              "Matrix V"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade-in"
+            ],
+            "camera_moves": [
+              "Zoom-in on each matrix"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "VGroup",
+              "Rectangle"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Show the attention function being computed on the matrices.",
+            "objects": [
+              "Matrix Q",
+              "Matrix K",
+              "Matrix V",
+              "Attention function"
+            ],
+            "equations": [
+              "Attention(Q, K, V) = softmax(QK^T / sqrt(d_k))V"
+            ],
+            "transitions": [
+              "Transform"
+            ],
+            "camera_moves": [
+              "Pan across the matrices and the attention function"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "VGroup",
+              "Arrow",
+              "Rectangle"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "sectionId": 2,
+      "script": {
+        "section_id": 2,
+        "target": "Comparison of attention functions",
+        "section_text": "The two most commonly used attention functions are additive attention [2], and dot-product (multiplicative) attention. Dot-product attention is identical to our algorithm, except for the scaling factor of 1/√dk. Additive attention computes the compatibility function using a feed-forward network with a single hidden layer. While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.",
+        "narration": "Let's compare two commonly used attention functions: additive attention and dot-product attention. Dot-product attention is similar to our algorithm, but includes a scaling factor of 1 over the square root of dk. Additive attention, on the other hand, uses a feed-forward network with a single hidden layer to compute the compatibility function. Although both methods are similar in theoretical complexity, dot-product attention is generally faster and more space-efficient in practice. This is because it can leverage highly optimized matrix multiplication code.",
+        "approx_duration_seconds": 25,
+        "min_duration_seconds": 20,
+        "max_duration_seconds": 30,
+        "timing_estimate": [
+          {
+            "start_second": 0.0,
+            "end_second": 5.0,
+            "note": "Introduction to the comparison of attention functions."
+          },
+          {
+            "start_second": 5.0,
+            "end_second": 12.0,
+            "note": "Explanation of dot-product attention and its scaling factor."
+          },
+          {
+            "start_second": 12.0,
+            "end_second": 18.0,
+            "note": "Description of additive attention and its use of a feed-forward network."
+          },
+          {
+            "start_second": 18.0,
+            "end_second": 25.0,
+            "note": "Comparison of practical efficiency between the two attention functions."
+          }
+        ]
+      },
+      "visual": {
+        "section_id": 2,
+        "target": "Comparison of attention functions",
+        "concepts": [
+          "Additive Attention",
+          "Dot-Product Attention",
+          "Scaling Factor",
+          "Feed-Forward Network",
+          "Matrix Multiplication"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to the two types of attention functions.",
+            "objects": [
+              "Title Text: Attention Functions",
+              "Text: Additive Attention",
+              "Text: Dot-Product Attention"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in title",
+              "Write in types of attention functions"
+            ],
+            "camera_moves": [
+              "Zoom in on title",
+              "Pan to list of attention functions"
+            ],
+            "manim_primitives": [
+              "Text",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Explanation of dot-product attention and its scaling factor.",
+            "objects": [
+              "Text: Dot-Product Attention",
+              "MathTex: Scaling Factor: 1/√dk",
+              "Arrow pointing to scaling factor"
+            ],
+            "equations": [
+              "1/√dk"
+            ],
+            "transitions": [
+              "Transform from previous scene",
+              "Write in scaling factor equation"
+            ],
+            "camera_moves": [
+              "Focus on scaling factor"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 3,
+            "storyboard": "Explanation of additive attention and its feed-forward network.",
+            "objects": [
+              "Text: Additive Attention",
+              "Diagram: Feed-Forward Network",
+              "Text: Single Hidden Layer"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform from previous scene",
+              "Draw feed-forward network diagram"
+            ],
+            "camera_moves": [
+              "Focus on feed-forward network diagram"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Rectangle",
+              "Arrow",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 4,
+            "storyboard": "Comparison of the two attention functions in terms of efficiency.",
+            "objects": [
+              "Text: Theoretical Complexity",
+              "Text: Practical Efficiency",
+              "Text: Dot-Product Attention - Faster",
+              "Text: Matrix Multiplication"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform from previous scene",
+              "Write in comparison points"
+            ],
+            "camera_moves": [
+              "Pan across comparison points"
+            ],
+            "manim_primitives": [
+              "Text",
+              "VGroup"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "sectionId": 3,
+      "script": {
+        "section_id": 3,
+        "target": "Scaling dot products for large dk",
         "section_text": "Scaled Dot-Product Attention\nMulti-Head Attention\nFigure 2: (left) Scaled Dot-Product Attention. (right) Multi-Head Attention consists of several attention layers running in parallel.\nquery with all keys, divide each by√dk, and apply a softmax function to obtain the weights on the values.\nIn practice, we compute the attention function on a set of queries simultaneously, packed together into a matrixQ. The keys and values are also packed together into matricesK andV . We compute the matrix of outputs as:\nAttention(Q,K,V ) = softmax(QK T\n√dk\n)V (1)\nThe two most commonly used attention functions are additive attention [2], and dot-product (multiplicative) attention. Dot-product attention is identical to our algorithm, except for the scaling factor of 1√dk. Additive attention computes the compatibility function using a feed-forward network with a single hidden layer. While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.\nWhile for small values ofdk the two mechanisms perform similarly, additive attention outperforms dot product attention without scaling for larger values ofdk [3]. We suspect that for large values of dk, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients 4. To counteract this effect, we scale the dot products by 1√dk.\n3.2.2 Multi-Head Attention\nInstead of performing a single attention function with dmodel-dimensional keys, values and queries, we found it beneficial to linearly project the queries, keys and values h times with different, learned linear projections to dk, dk and dv dimensions, respectively. On each of these projected versions of queries, keys and values we then perform the attention function in parallel, yielding dv-dimensional output values. These are concatenated and once again projected, resulting in the final values, as depicted in Figure 2.\nMulti-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.",
-        "narration": "In this section, we explore the concept of Scaled Dot-Product Attention and Multi-Head Attention. On the left, we see Scaled Dot-Product Attention, and on the right, Multi-Head Attention with parallel attention layers. In dot-product attention, queries are compared with keys, divided by the square root of dk, and a softmax function is applied to get the weights on the values. This process is efficiently computed using matrices. Dot-product attention includes a scaling factor to prevent large dot products from pushing the softmax function into regions with small gradients. Multi-Head Attention improves performance by projecting queries, keys, and values multiple times and performing attention in parallel, allowing the model to focus on different representation subspaces.",
+        "narration": "In this section, we discuss scaling dot products for large values of dk. The figure shows two diagrams: Scaled Dot-Product Attention on the left and Multi-Head Attention on the right. Multi-Head Attention consists of several attention layers running in parallel. To compute the attention, we query with all keys, divide each by the square root of dk, and apply a softmax function to obtain the weights on the values. In practice, we compute the attention function on a set of queries simultaneously, packed into matrices Q, K, and V. The output matrix is computed as Attention(Q, K, V) equals softmax of QK transpose over the square root of dk, multiplied by V. Dot-product attention, which is faster and more space-efficient, is used with a scaling factor to prevent large dot products from pushing the softmax function into regions with extremely small gradients. Multi-head attention projects queries, keys, and values multiple times and performs the attention function in parallel, allowing the model to attend to information from different subspaces at different positions.",
         "approx_duration_seconds": 60,
-        "min_duration_seconds": 50,
-        "max_duration_seconds": 70,
+        "min_duration_seconds": 55,
+        "max_duration_seconds": 65,
         "timing_estimate": [
           {
             "start_second": 0.0,
             "end_second": 10.0,
-            "note": "Introduction to Scaled Dot-Product Attention and Multi-Head Attention."
+            "note": "Introduction to scaling dot products and mention of the figure."
           },
           {
             "start_second": 10.0,
             "end_second": 20.0,
-            "note": "Explanation of the left side of Figure 2: Scaled Dot-Product Attention."
+            "note": "Explanation of computing attention with queries, keys, and values."
           },
           {
             "start_second": 20.0,
             "end_second": 30.0,
-            "note": "Explanation of the right side of Figure 2: Multi-Head Attention."
+            "note": "Description of dot-product attention and its advantages."
           },
           {
             "start_second": 30.0,
             "end_second": 45.0,
-            "note": "Process of comparing queries with keys and applying softmax in dot-product attention."   
+            "note": "Discussion on scaling to prevent small gradients in softmax."
           },
           {
             "start_second": 45.0,
-            "end_second": 55.0,
-            "note": "Importance of the scaling factor in dot-product attention."
-          },
-          {
-            "start_second": 55.0,
-            "end_second": 65.0,
-            "note": "Explanation of Multi-Head Attention and its benefits."
+            "end_second": 60.0,
+            "note": "Explanation of multi-head attention and its benefits."
           }
         ]
       },
-      {
-        "section_id": 2,
+      "visual": {
+        "section_id": 3,
+        "target": "Scaling dot products for large dk",
+        "concepts": [
+          "Scaled Dot-Product Attention",
+          "Multi-Head Attention",
+          "Matrices Q, K, V",
+          "Softmax function",
+          "Dot-product attention",
+          "Scaling factor 1/√dk"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to Scaled Dot-Product Attention and Multi-Head Attention with a split screen showing two diagrams.",
+            "objects": [
+              "Diagram of Scaled Dot-Product Attention",
+              "Diagram of Multi-Head Attention"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in diagrams"
+            ],
+            "camera_moves": [
+              "Zoom in on the split screen"
+            ],
+            "manim_primitives": [
+              "ImageMobject",
+              "VGroup",
+              "Text"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Explanation of the attention computation process with matrices Q, K, and V.",
+            "objects": [
+              "Matrix Q",
+              "Matrix K",
+              "Matrix V",
+              "Equation: Attention(Q, K, V) = softmax(QK^T / √dk)V"
+            ],
+            "equations": [
+              "Attention(Q,K,V ) = softmax(QK T / √dk)V"
+            ],
+            "transitions": [
+              "Fade in matrices and equation"
+            ],
+            "camera_moves": [
+              "Focus on each matrix and the equation sequentially"
+            ],
+            "manim_primitives": [
+              "MathTex",
+              "Matrix",
+              "Text",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 3,
+            "storyboard": "Comparison of dot-product attention and additive attention, highlighting the scaling factor.",
+            "objects": [
+              "Text: Dot-product attention",
+              "Text: Additive attention",
+              "Equation: Scaling factor 1/√dk"
+            ],
+            "equations": [
+              "1/√dk"
+            ],
+            "transitions": [
+              "Fade in text and equation"
+            ],
+            "camera_moves": [
+              "Pan between the texts and focus on the scaling factor"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 4,
+            "storyboard": "Explanation of Multi-Head Attention with parallel processing of queries, keys, and values.",
+            "objects": [
+              "Diagram of Multi-Head Attention",
+              "Text: Parallel processing",
+              "Arrows indicating parallel paths"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in diagram and text"
+            ],
+            "camera_moves": [
+              "Zoom in on the parallel paths in the diagram"
+            ],
+            "manim_primitives": [
+              "ImageMobject",
+              "Text",
+              "Arrow",
+              "VGroup"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "sectionId": 4,
+      "script": {
+        "section_id": 4,
         "target": "Introduction to Multi-Head Attention",
-        "section_text": "3.2.2 Multi-Head Attention Instead of performing a single attention function with dmodel-dimensional keys, values and queries, we found it beneficial to linearly project the queries, keys and values h times with different, learned linear projections to dk, dk and dv dimensions, respectively. On each of these projected versions of queries, keys and values we then perform the attention function in parallel, yielding dv-dimensional output values. These are concatenated and once again projected, resulting in the final values, as depicted in Figure 2. Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.", 
-        "narration": "Instead of using a single attention function with high-dimensional keys, values, and queries, multi-head attention projects these elements multiple times with different learned linear projections. This process results in lower-dimensional versions of queries, keys, and values. The attention function is then performed in parallel on each of these projected versions, producing output values that are concatenated and projected once more to yield the final values. This mechanism allows the model to focus on information from various representation subspaces at different positions simultaneously, which a single attention head cannot achieve effectively.",
-        "approx_duration_seconds": 45,
-        "min_duration_seconds": 40,
-        "max_duration_seconds": 50,
+        "section_text": "3.2.2 Multi-Head Attention Instead of performing a single attention function with dmodel-dimensional keys, values and queries, we found it beneficial to linearly project the queries, keys and values h times with different, learned linear projections to dk, dk and dv dimensions, respectively. On each of these projected versions of queries, keys and values we then perform the attention function in parallel, yielding dv-dimensional output values. These are concatenated and once again projected, resulting in the final values, as depicted in Figure 2. Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.",
+        "narration": "Instead of using a single attention function with high-dimensional keys, values, and queries, multi-head attention projects these elements multiple times using different learned linear projections. This process results in lower-dimensional versions of queries, keys, and values. The attention function is then performed in parallel on each of these projected versions, producing lower-dimensional output values. These outputs are concatenated and projected once more to obtain the final values, as shown in the diagram. Multi-head attention enables the model to simultaneously focus on information from various representation subspaces at different positions, an advantage not possible with a single attention head.",
+        "approx_duration_seconds": 40,
+        "min_duration_seconds": 35,
+        "max_duration_seconds": 45,
         "timing_estimate": [
           {
             "start_second": 0.0,
             "end_second": 8.0,
-            "note": "Introduction to the limitation of single attention function."
+            "note": "Introduction to the concept of multi-head attention and its advantage over single attention functions."
           },
           {
             "start_second": 8.0,
             "end_second": 18.0,
-            "note": "Explanation of linear projections in multi-head attention."
+            "note": "Explanation of the projection process of queries, keys, and values."
           },
           {
             "start_second": 18.0,
             "end_second": 28.0,
-            "note": "Description of parallel attention function performance."
+            "note": "Description of performing the attention function in parallel on projected versions."
           },
           {
             "start_second": 28.0,
             "end_second": 38.0,
-            "note": "Explanation of concatenation and final projection."
+            "note": "Explanation of concatenation and final projection to obtain the end values."      
           },
           {
             "start_second": 38.0,
-            "end_second": 45.0,
-            "note": "Benefits of multi-head attention over single attention head."
+            "end_second": 40.0,
+            "note": "Benefits of multi-head attention in focusing on different representation subspaces."
           }
         ]
       },
-      {
-        "section_id": 3,
+      "visual": {
+        "section_id": 4,
+        "target": "Introduction to Multi-Head Attention",
+        "concepts": [
+          "Multi-Head Attention",
+          "Linear Projections",
+          "Parallel Attention Functions",
+          "Concatenation of Outputs"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to Multi-Head Attention concept.",
+            "objects": [
+              "Title: Multi-Head Attention",
+              "Text: Introduction to the concept"
+            ],
+            "equations": [],
+            "transitions": [
+              "FadeIn"
+            ],
+            "camera_moves": [
+              "Center on title"
+            ],
+            "manim_primitives": [
+              "Text",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Explanation of linear projections in Multi-Head Attention.",
+            "objects": [
+              "Diagram: Linear Projections",
+              "Text: Queries, Keys, Values projections"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform"
+            ],
+            "camera_moves": [
+              "Zoom to diagram"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Rectangle",
+              "Arrow",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 3,
+            "storyboard": "Parallel attention functions and concatenation of outputs.",
+            "objects": [
+              "Diagram: Parallel Attention Functions",
+              "Text: Concatenation of outputs"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform"
+            ],
+            "camera_moves": [
+              "Pan across diagram"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Circle",
+              "Arrow",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 4,
+            "storyboard": "Final projection and benefits of Multi-Head Attention.",
+            "objects": [
+              "Diagram: Final Projection",
+              "Text: Benefits of Multi-Head Attention"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform"
+            ],
+            "camera_moves": [
+              "Zoom out to full diagram"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Rectangle",
+              "Arrow",
+              "VGroup"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "sectionId": 5,
+      "script": {
+        "section_id": 5,
         "target": "Benefits of Multi-Head Attention",
-        "section_text": "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.",    
-        "narration": "Multi-head attention offers significant advantages. It enables the model to simultaneously focus on information from various representation subspaces at different positions. This capability is hindered in models with a single attention head due to averaging.",
+        "section_text": "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.",
+        "narration": "Multi-head attention offers a significant advantage. It enables the model to simultaneously focus on information from various representation subspaces at different positions. This is not possible with a single attention head, where averaging can limit this capability.",
         "approx_duration_seconds": 15,
-        "min_duration_seconds": 12,
-        "max_duration_seconds": 18,
+        "min_duration_seconds": 10,
+        "max_duration_seconds": 20,
         "timing_estimate": [
           {
             "start_second": 0.0,
@@ -129,16 +644,207 @@
           },
           {
             "start_second": 5.0,
-            "end_second": 12.0,
+            "end_second": 15.0,
             "note": "Explanation of how multi-head attention allows the model to attend to different representation subspaces."
           },
           {
-            "start_second": 12.0,
-            "end_second": 15.0,
-            "note": "Comparison with single attention head and the issue of averaging."
+            "start_second": 15.0,
+            "end_second": 20.0,
+            "note": "Comparison with single attention head and the limitation of averaging."
+          }
+        ]
+      },
+      "visual": {
+        "section_id": 5,
+        "target": "Benefits of Multi-Head Attention",
+        "concepts": [
+          "Multi-head attention",
+          "Representation subspaces",
+          "Single attention head",
+          "Averaging limitation"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to Multi-head attention",
+            "objects": [
+              "Text: Multi-head attention",
+              "Text: Benefits"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in",
+              "Fade out"
+            ],
+            "camera_moves": [
+              "Zoom in on 'Multi-head attention'"
+            ],
+            "manim_primitives": [
+              "Text",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Comparison of Multi-head and Single attention head",
+            "objects": [
+              "Text: Multi-head attention",
+              "Text: Single attention head",
+              "Arrow pointing to different subspaces",
+              "Arrow pointing to a single subspace"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform from previous scene"
+            ],
+            "camera_moves": [
+              "Pan from 'Multi-head attention' to 'Single attention head'"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Arrow",
+              "VGroup"
+            ]
+          },
+          {
+            "scene_id": 3,
+            "storyboard": "Averaging limitation in Single attention head",
+            "objects": [
+              "Text: Single attention head",
+              "Text: Averaging limitation",
+              "Circle representing averaging"
+            ],
+            "equations": [],
+            "transitions": [
+              "Transform from previous scene"
+            ],
+            "camera_moves": [
+              "Zoom in on 'Averaging limitation'"
+            ],
+            "manim_primitives": [
+              "Text",
+              "Circle",
+              "VGroup"
+            ]
           }
         ]
       }
-    ] 
+    },
+    {
+      "sectionId": 6,
+      "script": {
+        "section_id": 6,
+        "target": "Explanation of dot product variance",
+        "section_text": "To illustrate why the dot products get large, assume that the components of q and k are independent random variables with mean 0 and variance 1. Then their dot product, q · k = ∑dk i=1 qiki, has mean 0 and variance dk.",
+        "narration": "To understand why dot products can get large, let's assume that the components of vectors q and k are independent random variables, each with a mean of 0 and a variance of 1. Under these conditions, the dot product of q and k, which is the sum of the products of their corresponding components, will have a mean of 0 and a variance of d times k. This variance is what causes the dot product to potentially become very large.",
+        "approx_duration_seconds": 30,
+        "min_duration_seconds": 25,
+        "max_duration_seconds": 35,
+        "timing_estimate": [
+          {
+            "start_second": 0.0,
+            "end_second": 5.0,
+            "note": "Introduction to the assumption of independent random variables."
+          },
+          {
+            "start_second": 5.0,
+            "end_second": 15.0,
+            "note": "Explanation of the mean and variance of the components of vectors q and k."       
+          },
+          {
+            "start_second": 15.0,
+            "end_second": 25.0,
+            "note": "Description of the dot product and its mean."
+          },
+          {
+            "start_second": 25.0,
+            "end_second": 30.0,
+            "note": "Explanation of the variance of the dot product and its potential to become large."
+          }
+        ]
+      },
+      "visual": {
+        "section_id": 6,
+        "target": "Explanation of dot product variance",
+        "concepts": [
+          "Random variables",
+          "Mean and variance",
+          "Dot product",
+          "Variance of dot product"
+        ],
+        "scenes": [
+          {
+            "scene_id": 1,
+            "storyboard": "Introduction to vectors q and k as random variables.",
+            "objects": [
+              "Vector q",
+              "Vector k",
+              "Text: Mean = 0",
+              "Text: Variance = 1"
+            ],
+            "equations": [],
+            "transitions": [
+              "Fade in vectors q and k",
+              "Write in mean and variance text"
+            ],
+            "camera_moves": [
+              "Zoom in on vectors"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "VGroup",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 2,
+            "storyboard": "Explanation of dot product formula.",
+            "objects": [
+              "Dot product formula: q · k = ∑dk i=1 qiki",
+              "Vector q",
+              "Vector k"
+            ],
+            "equations": [
+              "q · k = ∑dk i=1 qiki"
+            ],
+            "transitions": [
+              "Transform vectors into dot product formula"
+            ],
+            "camera_moves": [
+              "Focus on the dot product formula"
+            ],
+            "manim_primitives": [
+              "MathTex",
+              "Text",
+              "Arrow"
+            ]
+          },
+          {
+            "scene_id": 3,
+            "storyboard": "Explanation of dot product variance.",
+            "objects": [
+              "Text: Mean of dot product = 0",
+              "Text: Variance of dot product = dk",
+              "Dot product formula: q · k = ∑dk i=1 qiki"
+            ],
+            "equations": [
+              "Variance of q · k = dk"
+            ],
+            "transitions": [
+              "Fade in mean and variance text"
+            ],
+            "camera_moves": [
+              "Zoom out to show full explanation"
+            ],
+            "manim_primitives": [
+              "Text",
+              "MathTex",
+              "VGroup"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
-    

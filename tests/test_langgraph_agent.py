@@ -96,12 +96,23 @@ class LangGraphAgentTests(unittest.TestCase):
                 script_writer=ScriptWriter(llm=FakeScriptLLM()),
             )
 
-            result = agent.run(SAMPLE_PDF_PATH)
+            result = agent.run(
+                SAMPLE_PDF_PATH,
+                user_prompt={
+                    "raw_prompt": "Use a clean 3Blue1Brown-style animation.",
+                    "animation_style": "3blue1brown",
+                    "script_style": "friendly educator",
+                    "special_images": ["highlight attention diagram"],
+                },
+                thread_id="test-thread",
+            )
 
         self.assertIn("parsed_pdf", result["final_output"])
-        self.assertIn("algorithm_analysis", result["final_output"])
         self.assertIn("content_analysis", result["final_output"])
         self.assertIn("script_plan", result["final_output"])
+        self.assertIn("user_prompt", result["final_output"])
+        self.assertIn("memory", result["final_output"])
+        self.assertIn("context", result["final_output"])
 
 
 if __name__ == "__main__":

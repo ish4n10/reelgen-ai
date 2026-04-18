@@ -5,7 +5,11 @@ from pathlib import Path
 
 from langchain_core.tools import StructuredTool
 
-from reelaigen.agents.state import AlgorithmAnalysisPayload, PDFContentAgentState, ParsedPDFPayload
+from reelaigen.agents.langgraph_agent.state import (
+    AlgorithmAnalysisPayload,
+    PDFContentAgentState,
+    ParsedPDFPayload,
+)
 from reelaigen.nodes.algorithm_parser import AlgorithmAnalysis, AlgorithmParser
 from reelaigen.nodes.content_parser import ContentAnalysis, ContentParser
 from reelaigen.nodes.pdf_parser import PDFParser, PDFParserConfig

@@ -1,5 +1,6 @@
 manim
 langchain
+langchain-community
 langgraph
 langchain-mistralai
 langchain-openai
@@ -7,3 +8,4 @@ pydantic
 pypdf
 pypdfium2
 python-dotenv
+faiss-cpu

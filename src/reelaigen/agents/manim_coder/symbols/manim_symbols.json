@@ -1,0 +1,449 @@
+{
+  "source": {
+    "name": "Manim Community Reference Manual",
+    "version": "v0.20.1",
+    "url": "https://docs.manim.community/en/stable/reference.html",
+    "notes": "Curated starter symbol index written from the official Manim reference manual. Categories and symbol names come from the docs. Tags are lightweight retrieval hints added for ReelaiGen."
+  },
+  "available_tags": [
+    "2d",
+    "3d",
+    "animation",
+    "arrow",
+    "asset",
+    "axes",
+    "base",
+    "bitmap",
+    "box",
+    "brace",
+    "bullets",
+    "camera",
+    "chart",
+    "circle",
+    "code",
+    "container",
+    "data",
+    "direction",
+    "draw",
+    "enter",
+    "equation",
+    "fade",
+    "focus",
+    "geometry",
+    "graphing",
+    "grid",
+    "group",
+    "heading",
+    "highlight",
+    "image",
+    "label",
+    "latex",
+    "layout",
+    "line",
+    "list",
+    "marker",
+    "math",
+    "matrix",
+    "mobject",
+    "morph",
+    "movement",
+    "multi_line",
+    "number_line",
+    "object",
+    "paragraph",
+    "parametric",
+    "plane",
+    "plot",
+    "point",
+    "polygon",
+    "rectangle",
+    "replace",
+    "rich_text",
+    "root",
+    "scene",
+    "segment",
+    "shape",
+    "sphere",
+    "state",
+    "surface",
+    "syntax_highlight",
+    "table",
+    "text",
+    "title",
+    "tracking",
+    "transform",
+    "vector",
+    "vectorized"
+  ],
+  "symbols": [
+    {
+      "symbol": "Scene",
+      "type": "class",
+      "category": "Scenes",
+      "subcategory": "scene",
+      "top_level_import": "from manim import Scene",
+      "tags": ["scene", "base", "2d", "root"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "ThreeDScene",
+      "type": "class",
+      "category": "Scenes",
+      "subcategory": "three_d_scene",
+      "top_level_import": "from manim import ThreeDScene",
+      "tags": ["scene", "3d", "camera"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "MovingCameraScene",
+      "type": "class",
+      "category": "Scenes",
+      "subcategory": "moving_camera_scene",
+      "top_level_import": "from manim import MovingCameraScene",
+      "tags": ["scene", "camera", "movement"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Mobject",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "mobject",
+      "top_level_import": "from manim import Mobject",
+      "tags": ["mobject", "base", "object"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Group",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "mobject",
+      "top_level_import": "from manim import Group",
+      "tags": ["group", "layout", "container"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "VGroup",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "vectorized_mobject",
+      "top_level_import": "from manim import VGroup",
+      "tags": ["group", "vectorized", "container"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Text",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "text_mobject",
+      "top_level_import": "from manim import Text",
+      "tags": ["text", "label", "title", "2d"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "MarkupText",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "text_mobject",
+      "top_level_import": "from manim import MarkupText",
+      "tags": ["text", "rich_text", "label"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Paragraph",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "text_mobject",
+      "top_level_import": "from manim import Paragraph",
+      "tags": ["text", "paragraph", "multi_line"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Title",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "tex_mobject",
+      "top_level_import": "from manim import Title",
+      "tags": ["text", "title", "heading"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Tex",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "tex_mobject",
+      "top_level_import": "from manim import Tex",
+      "tags": ["latex", "text", "equation"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "MathTex",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "tex_mobject",
+      "top_level_import": "from manim import MathTex",
+      "tags": ["latex", "math", "equation"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "BulletedList",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "tex_mobject",
+      "top_level_import": "from manim import BulletedList",
+      "tags": ["text", "list", "bullets"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Code",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "code_mobject",
+      "top_level_import": "from manim import Code",
+      "tags": ["code", "syntax_highlight", "text"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Circle",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "arc",
+      "top_level_import": "from manim import Circle",
+      "tags": ["geometry", "shape", "circle"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Dot",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "arc",
+      "top_level_import": "from manim import Dot",
+      "tags": ["geometry", "point", "marker"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Line",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "line",
+      "top_level_import": "from manim import Line",
+      "tags": ["geometry", "line", "segment"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Arrow",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "line",
+      "top_level_import": "from manim import Arrow",
+      "tags": ["geometry", "arrow", "direction"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Polygon",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "polygram",
+      "top_level_import": "from manim import Polygon",
+      "tags": ["geometry", "polygon", "shape"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Rectangle",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "polygram",
+      "top_level_import": "from manim import Rectangle",
+      "tags": ["geometry", "rectangle", "box"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Square",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "polygram",
+      "top_level_import": "from manim import Square",
+      "tags": ["geometry", "square", "shape"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "SurroundingRectangle",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "shape_matchers",
+      "top_level_import": "from manim import SurroundingRectangle",
+      "tags": ["highlight", "box", "focus"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Brace",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "brace",
+      "top_level_import": "from manim import Brace",
+      "tags": ["annotation", "brace", "label"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Axes",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "coordinate_systems",
+      "top_level_import": "from manim import Axes",
+      "tags": ["graphing", "axes", "plot"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "ThreeDAxes",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "coordinate_systems",
+      "top_level_import": "from manim import ThreeDAxes",
+      "tags": ["graphing", "axes", "3d"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "NumberPlane",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "coordinate_systems",
+      "top_level_import": "from manim import NumberPlane",
+      "tags": ["graphing", "plane", "grid"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "NumberLine",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "number_line",
+      "top_level_import": "from manim import NumberLine",
+      "tags": ["graphing", "number_line", "axis"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "BarChart",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "probability",
+      "top_level_import": "from manim import BarChart",
+      "tags": ["chart", "bars", "data"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Matrix",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "matrix",
+      "top_level_import": "from manim import Matrix",
+      "tags": ["matrix", "math", "table"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Table",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "table",
+      "top_level_import": "from manim import Table",
+      "tags": ["table", "grid", "data"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "ImageMobject",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "image_mobject",
+      "top_level_import": "from manim import ImageMobject",
+      "tags": ["image", "bitmap", "asset"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "ValueTracker",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "value_tracker",
+      "top_level_import": "from manim import ValueTracker",
+      "tags": ["animation", "state", "tracking"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Arrow3D",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "three_dimensions",
+      "top_level_import": "from manim import Arrow3D",
+      "tags": ["3d", "arrow", "vector"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Sphere",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "three_dimensions",
+      "top_level_import": "from manim import Sphere",
+      "tags": ["3d", "sphere", "surface"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Surface",
+      "type": "class",
+      "category": "Mobjects",
+      "subcategory": "three_dimensions",
+      "top_level_import": "from manim import Surface",
+      "tags": ["3d", "surface", "parametric"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Create",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "creation",
+      "top_level_import": "from manim import Create",
+      "tags": ["animation", "draw", "enter"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Write",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "creation",
+      "top_level_import": "from manim import Write",
+      "tags": ["animation", "text", "draw"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "FadeIn",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "fading",
+      "top_level_import": "from manim import FadeIn",
+      "tags": ["animation", "fade", "enter"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "FadeOut",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "fading",
+      "top_level_import": "from manim import FadeOut",
+      "tags": ["animation", "fade", "exit"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "Transform",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "transform",
+      "top_level_import": "from manim import Transform",
+      "tags": ["animation", "transform", "morph"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    },
+    {
+      "symbol": "ReplacementTransform",
+      "type": "class",
+      "category": "Animations",
+      "subcategory": "transform",
+      "top_level_import": "from manim import ReplacementTransform",
+      "tags": ["animation", "transform", "replace"],
+      "reference_page": "https://docs.manim.community/en/stable/reference.html"
+    }
+  ]
+}

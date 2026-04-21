@@ -12,8 +12,8 @@ from langchain_mistralai import MistralAIEmbeddings
 load_dotenv(Path(__file__).resolve().parents[4] / ".env")
 
 BASE_DIR = Path(__file__).parent
-DEFAULT_EXAMPLES_PATH = BASE_DIR / "examples" / "manim_examples.json"
-DEFAULT_OUTPUT_PATH = BASE_DIR / "examples" / "manim_examples_faiss"
+DEFAULT_EXAMPLES_PATH = BASE_DIR / "knowledge_base" / "corpus" / "manim_examples.json"
+DEFAULT_OUTPUT_PATH = BASE_DIR / "knowledge_base" / "indexes" / "manim_examples_faiss"
 DEFAULT_EMBEDDING_MODEL = "mistral-embed"
 
 

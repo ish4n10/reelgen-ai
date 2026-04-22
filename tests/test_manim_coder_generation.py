@@ -22,6 +22,7 @@ HAS_MISTRAL = importlib.util.find_spec("langchain_mistralai") is not None
 
 FAISS_DIR = Path(r"G:\reelaigen\src\reelaigen\agents\manim_coder\knowledge_base\indexes\manim_examples_faiss")
 INDEX_INFO_PATH = FAISS_DIR / "index_info.json"
+SECTION_TEST_PATH = Path(r"G:\reelaigen\section-test.json")
 
 
 def load_vector_store() -> FAISS:
@@ -70,6 +71,62 @@ def strip_code_fences(text: str) -> str:
             lines = lines[:-1]
         cleaned = "\n".join(lines).strip()
     return cleaned
+
+
+def load_pipeline_sections(limit: int = 4) -> list[dict]:
+    with SECTION_TEST_PATH.open("r", encoding="utf-8") as file:
+        payload = json.load(file)
+    return payload.get("sections", [])[:limit]
+
+
+def build_pipeline_query(sections: list[dict]) -> str:
+    parts = []
+
+    for section in sections:
+        script = section.get("script", {})
+        visual = section.get("visual", {})
+        concepts = ", ".join(visual.get("concepts", []))
+        parts.append(
+            f"Section {section.get('sectionId')}: "
+            f"target={script.get('target', '')}; "
+            f"concepts={concepts}"
+        )
+
+    return "Create a clean educational Manim animation for these transformer attention sections: " + " | ".join(parts)
+
+
+def build_pipeline_prompt(sections: list[dict]) -> str:
+    blocks = []
+
+    for section in sections:
+        script = section.get("script", {})
+        visual = section.get("visual", {})
+        scene_summaries = []
+
+        for scene in visual.get("scenes", []):
+            scene_summaries.append(
+                {
+                    "scene_id": scene.get("scene_id"),
+                    "storyboard": scene.get("storyboard"),
+                    "objects": scene.get("objects", []),
+                    "equations": scene.get("equations", []),
+                    "transitions": scene.get("transitions", []),
+                    "camera_moves": scene.get("camera_moves", []),
+                    "manim_primitives": scene.get("manim_primitives", []),
+                }
+            )
+
+        block = {
+            "sectionId": section.get("sectionId"),
+            "target": script.get("target", ""),
+            "narration": script.get("narration", ""),
+            "approx_duration_seconds": script.get("approx_duration_seconds"),
+            "concepts": visual.get("concepts", []),
+            "scenes": scene_summaries,
+        }
+        blocks.append(block)
+
+    return json.dumps(blocks, indent=2, ensure_ascii=False)
 
 
 class ManimCoderGenerationTests(unittest.TestCase):
@@ -122,6 +179,68 @@ class ManimCoderGenerationTests(unittest.TestCase):
         print("\nRetrieved examples context:\n")
         print(context)
         print("\nGenerated Manim code:\n")
+        print(generated_code)
+
+        self.assertTrue(generated_code.strip())
+        self.assertIn("from manim import *", generated_code)
+        self.assertIn("class ", generated_code)
+        self.assertIn("def construct", generated_code)
+
+
+class PipelineTests(unittest.TestCase):
+    def test_generates_manim_code_from_section_pipeline_prompt(self) -> None:
+        if not HAS_FAISS:
+            self.skipTest("faiss is not installed")
+        if not HAS_LANGCHAIN_COMMUNITY:
+            self.skipTest("langchain_community is not installed")
+        if not HAS_MISTRAL:
+            self.skipTest("langchain_mistralai is not installed")
+        if not os.getenv("MISTRAL_API_KEY"):
+            self.skipTest("MISTRAL_API_KEY is not set")
+        if not FAISS_DIR.exists():
+            self.skipTest(f"FAISS directory not found: {FAISS_DIR}")
+        if not INDEX_INFO_PATH.exists():
+            self.skipTest(f"Index info file not found: {INDEX_INFO_PATH}")
+        if not SECTION_TEST_PATH.exists():
+            self.skipTest(f"Section test file not found: {SECTION_TEST_PATH}")
+
+        sections = load_pipeline_sections(limit=4)
+        query = build_pipeline_query(sections)
+        pipeline_prompt = build_pipeline_prompt(sections)
+
+        vector_store = load_vector_store()
+        docs = vector_store.similarity_search(query, k=4)
+        context = build_context(docs)
+
+        llm = get_mistral_llm()
+        messages = [
+            SystemMessage(
+                content=(
+                    "You are a Manim code generator.\n"
+                    "You receive pipeline sections from an educational video system.\n"
+                    "Use the retrieved examples as API grounding.\n"
+                    "Write one runnable Manim Python file.\n"
+                    "Return code only."
+                )
+            ),
+            HumanMessage(
+                content=(
+                    f"Pipeline sections:\n{pipeline_prompt}\n\n"
+                    f"Retrieval query:\n{query}\n\n"
+                    f"Retrieved examples:\n{context}\n\n"
+                    "Generate one Manim scene or a small sequence of scenes that explains these first sections.\n"
+                    "Keep it educational, readable, and grounded in the provided pipeline data."
+                )
+            ),
+        ]
+        response = llm.invoke(messages)
+        generated_code = strip_code_fences(str(response.content))
+
+        print("\nPipeline sections prompt:\n")
+        print(pipeline_prompt)
+        print("\nRetrieved examples context:\n")
+        print(context)
+        print("\nGenerated Manim code from pipeline sections:\n")
         print(generated_code)
 
         self.assertTrue(generated_code.strip())

@@ -4,6 +4,7 @@ from langchain_core.tools import tool
 
 from .example_retriever import format_examples_for_prompt, search_examples
 from .renderer import render_manim_code
+from .scene_diagnostics import inspect_manim_code
 from .static_validator import validate_manim_code
 from .symbol_lookup import SymbolLookup
 
@@ -42,3 +43,9 @@ def validate_manim_code_tool(code: str) -> dict:
 def render_manim_code_tool(code: str, scene_name: str) -> dict:
     """Render generated Manim code with the local Manim CLI."""
     return render_manim_code(code, scene_name)
+
+
+@tool("inspect_manim_code")
+def inspect_manim_code_tool(code: str, scene_name: str) -> dict:
+    """Run static validation and instrumented scene diagnostics, then return an LLM-ready repair report."""
+    return inspect_manim_code(code, scene_name).model_dump()

@@ -83,6 +83,10 @@ def overlap_ratio(first: SceneObjectSnapshot, second: SceneObjectSnapshot) -> fl
 
 
 def should_skip_overlap(first: SceneObjectSnapshot, second: SceneObjectSnapshot) -> bool:
+    ignored_types = {"ScreenRectangle", "BackgroundRectangle"}
+    if first.object_type in ignored_types or second.object_type in ignored_types:
+        return True
+
     small_types = {"Dot", "Point"}
     if first.object_type in small_types or second.object_type in small_types:
         return True

@@ -27,3 +27,22 @@ class ValidationResult(BaseModel):
     passed: bool = Field(default=False, description="Whether validation passed.")
     errors: list[str] = Field(default_factory=list, description="Validation errors.")
     warnings: list[str] = Field(default_factory=list, description="Validation warnings.")
+
+
+class DiagnosticIssue(BaseModel):
+    step: int = Field(default=0, description="Observed runtime step.")
+    event: str = Field(default="", description="Runtime event name.")
+    category: str = Field(default="", description="Issue category such as bbox, layout, or connection.")
+    severity: str = Field(default="warning", description="Issue severity.")
+    message: str = Field(default="", description="Human-readable issue description.")
+    object_ids: list[str] = Field(default_factory=list, description="Related object ids when available.")
+
+
+class SceneDiagnosticsResult(BaseModel):
+    passed: bool = Field(default=False, description="Whether diagnostics are acceptable.")
+    static_validation: ValidationResult = Field(default_factory=ValidationResult, description="Static validation output.")
+    render_success: bool = Field(default=False, description="Whether scene rendering completed successfully.")
+    render_error: str = Field(default="", description="Runtime render error if any.")
+    issues: list[DiagnosticIssue] = Field(default_factory=list, description="Structured scene diagnostics.")
+    repair_prompt: str = Field(default="", description="Compact LLM-facing prompt describing what to repair.")
+    runtime_report: dict = Field(default_factory=dict, description="Raw runtime report.")

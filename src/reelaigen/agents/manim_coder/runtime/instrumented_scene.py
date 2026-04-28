@@ -2,26 +2,32 @@ from __future__ import annotations
 
 from manim import UP, FadeOut, Group, MovingCameraScene, Text, Write, config
 
-from .camera_repairer import repair_camera_frame
-from .connection_repairer import repair_scene_connections
+from .bbox_observer import build_bbox_report
+from .connection_linter import lint_scene_connections
 from .gc_planner import plan_gc_actions
 from .layout_linter import lint_snapshot
-from .layout_repairer import repair_scene_layout
 from .registry import ObjectRegistry
 from .snapshot import capture_scene_snapshot, diff_snapshots
 
 
 class InstrumentedScene(MovingCameraScene):
     def __init__(self, *args, **kwargs) -> None:
-        self.auto_repair_layout = kwargs.pop("auto_repair_layout", True)
-        self.auto_repair_connections = kwargs.pop("auto_repair_connections", True)
-        self.auto_repair_camera = kwargs.pop("auto_repair_camera", True)
+        runtime_mode = kwargs.pop("runtime_mode", "observe")
+        repair_by_default = runtime_mode == "repair"
+
+        self.runtime_mode = runtime_mode
+        self.auto_repair_layout = kwargs.pop("auto_repair_layout", repair_by_default)
+        self.auto_repair_connections = kwargs.pop("auto_repair_connections", repair_by_default)
+        self.auto_repair_camera = kwargs.pop("auto_repair_camera", repair_by_default)
+        self.capture_bbox_reports = kwargs.pop("capture_bbox_reports", True)
         self.compact_timing = kwargs.pop("compact_timing", True)
         self.default_play_run_time = kwargs.pop("default_play_run_time", 0.75)
         self.max_wait_time = kwargs.pop("max_wait_time", 0.45)
         self.object_registry = ObjectRegistry()
         self.scene_snapshots = []
         self.scene_diffs = []
+        self.bbox_reports = []
+        self.connection_reports = []
         self.layout_reports = []
         self.layout_repairs = []
         self.connection_repairs = []
@@ -33,7 +39,6 @@ class InstrumentedScene(MovingCameraScene):
 
     def add(self, *mobjects):
         result = super().add(*mobjects)
-        self.repair_runtime("add")
         self.observe("add")
         return result
 
@@ -58,7 +63,6 @@ class InstrumentedScene(MovingCameraScene):
         if is_full_scene_fadeout(args, mobjects_before_play):
             super().clear()
             self.object_registry.clear()
-        self.repair_runtime("after_play")
         after = self.observe("after_play")
         if before and after:
             self.scene_diffs.append(diff_snapshots(before, after).to_dict())
@@ -95,58 +99,7 @@ class InstrumentedScene(MovingCameraScene):
             return self.play(action, run_time=0.4)
 
         frame.set(width=target_width).move_to(group)
-        self.repair_runtime("safe_focus")
         return None
-
-    def repair_runtime(self, event: str) -> None:
-        self.repair_layout(event)
-        self.repair_connections(event)
-        self.repair_camera(event)
-
-    def repair_layout(self, event: str) -> list[dict]:
-        if not self.auto_repair_layout:
-            return []
-
-        repairs = repair_scene_layout(self)
-        if repairs:
-            self.layout_repairs.append(
-                {
-                    "step": self._instrument_step + 1,
-                    "event": event,
-                    "repairs": repairs,
-                }
-            )
-        return repairs
-
-    def repair_connections(self, event: str) -> list[dict]:
-        if not self.auto_repair_connections:
-            return []
-
-        repairs = repair_scene_connections(self)
-        if repairs:
-            self.connection_repairs.append(
-                {
-                    "step": self._instrument_step + 1,
-                    "event": event,
-                    "repairs": repairs,
-                }
-            )
-        return repairs
-
-    def repair_camera(self, event: str) -> list[dict]:
-        if not self.auto_repair_camera:
-            return []
-
-        repairs = repair_camera_frame(self)
-        if repairs:
-            self.camera_repairs.append(
-                {
-                    "step": self._instrument_step + 1,
-                    "event": event,
-                    "repairs": repairs,
-                }
-            )
-        return repairs
 
     def repair_play_timing(self, kwargs: dict) -> dict:
         if not self.compact_timing or "run_time" in kwargs:
@@ -189,6 +142,14 @@ class InstrumentedScene(MovingCameraScene):
             step=self._instrument_step,
         )
         self.scene_snapshots.append(snapshot)
+        if self.capture_bbox_reports:
+            self.bbox_reports.append(
+                {
+                    "step": snapshot.step,
+                    "event": event,
+                    "report": build_bbox_report(self, self.object_registry),
+                }
+            )
         self.layout_reports.append(
             {
                 "step": snapshot.step,
@@ -196,14 +157,26 @@ class InstrumentedScene(MovingCameraScene):
                 "issues": lint_snapshot(snapshot),
             }
         )
+        self.connection_reports.append(
+            {
+                "step": snapshot.step,
+                "event": event,
+                "issues": lint_scene_connections(self),
+            }
+        )
         self.gc_plans = plan_gc_actions(self.scene_snapshots)
         return snapshot
 
     def get_runtime_report(self) -> dict:
         layout_issue_steps = sum(1 for item in self.layout_reports if item.get("issues"))
+        bbox_collision_steps = sum(1 for item in self.bbox_reports if item["report"].get("collisions"))
+        bbox_out_of_frame_steps = sum(1 for item in self.bbox_reports if item["report"].get("out_of_frame"))
+        connection_issue_steps = sum(1 for item in self.connection_reports if item.get("issues"))
         return {
             "snapshots": [snapshot.to_dict() for snapshot in self.scene_snapshots],
             "diffs": self.scene_diffs,
+            "bbox_reports": self.bbox_reports,
+            "connection_reports": self.connection_reports,
             "layout_reports": self.layout_reports,
             "layout_repairs": self.layout_repairs,
             "connection_repairs": self.connection_repairs,
@@ -212,6 +185,9 @@ class InstrumentedScene(MovingCameraScene):
             "gc_plans": self.gc_plans,
             "snapshot_count": len(self.scene_snapshots),
             "diff_count": len(self.scene_diffs),
+            "bbox_collision_steps": bbox_collision_steps,
+            "bbox_out_of_frame_steps": bbox_out_of_frame_steps,
+            "connection_issue_steps": connection_issue_steps,
             "layout_issue_steps": layout_issue_steps,
             "layout_repair_steps": len(self.layout_repairs),
             "connection_repair_steps": len(self.connection_repairs),

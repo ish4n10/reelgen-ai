@@ -8,17 +8,20 @@ from manim import Arrow, CurvedArrow, DashedLine, Line
 CONNECTOR_TYPES = (Arrow, Line, DashedLine, CurvedArrow)
 
 
-def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold: float = 0.25) -> list[dict[str, Any]]:
+def lint_scene_connections(scene, registry=None, max_distance: float = 1.35, endpoint_threshold: float = 0.25) -> list[dict[str, Any]]:
     issues: list[dict[str, Any]] = []
     connectors = find_connectors(scene)
     targets = find_targets(scene, connectors)
 
     for connector in connectors:
+        connector_id = registry.get_id(connector) if registry is not None else ""
         start_point = connector.get_start()
         end_point = connector.get_end()
 
         start_target = nearest_target(start_point, targets, max_distance)
         end_target = nearest_target(end_point, targets, max_distance)
+        start_target_id = registry.get_id(start_target) if registry is not None and start_target is not None else ""
+        end_target_id = registry.get_id(end_target) if registry is not None and end_target is not None else ""
 
         if start_target is None or end_target is None:
             issues.append(
@@ -26,6 +29,7 @@ def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold
                     "issue_type": "unanchored_connector",
                     "severity": "warning",
                     "connector_type": type(connector).__name__,
+                    "object_ids": [connector_id],
                     "message": f"{type(connector).__name__} is not clearly anchored to scene objects.",
                 }
             )
@@ -37,6 +41,7 @@ def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold
                     "issue_type": "self_connector",
                     "severity": "warning",
                     "connector_type": type(connector).__name__,
+                    "object_ids": [connector_id, start_target_id],
                     "message": f"{type(connector).__name__} appears to connect an object to itself.",
                 }
             )
@@ -53,6 +58,7 @@ def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold
                     "connector_type": type(connector).__name__,
                     "start_type": type(start_target).__name__,
                     "end_type": type(end_target).__name__,
+                    "object_ids": [connector_id, start_target_id, end_target_id],
                     "message": (
                         f"{type(connector).__name__} endpoints drift from boundary anchors "
                         f"({start_error:.2f}, {end_error:.2f})."
@@ -66,12 +72,14 @@ def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold
                     "issue_type": "collapsed_connector",
                     "severity": "warning",
                     "connector_type": type(connector).__name__,
+                    "object_ids": [connector_id, start_target_id, end_target_id],
                     "message": f"{type(connector).__name__} is visually collapsed or too short.",
                 }
             )
 
         orientation_issue = find_orientation_issue(connector, start_target, end_target)
         if orientation_issue is not None:
+            orientation_issue["object_ids"] = [connector_id, start_target_id, end_target_id]
             issues.append(orientation_issue)
 
         crossing_target = find_crossed_target(connector, targets, start_target, end_target)
@@ -81,6 +89,12 @@ def lint_scene_connections(scene, max_distance: float = 1.35, endpoint_threshold
                     "issue_type": "connector_crosses_object",
                     "severity": "warning",
                     "connector_type": type(connector).__name__,
+                    "object_ids": [
+                        connector_id,
+                        start_target_id,
+                        end_target_id,
+                        registry.get_id(crossing_target) if registry is not None else "",
+                    ],
                     "message": (
                         f"{type(connector).__name__} appears to pass through "
                         f"{type(crossing_target).__name__} instead of routing around it."

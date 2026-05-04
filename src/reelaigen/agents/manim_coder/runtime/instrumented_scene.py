@@ -35,6 +35,7 @@ class InstrumentedScene(MovingCameraScene):
         self.timing_repairs = []
         self.gc_plans = []
         self._instrument_step = 0
+        self.current_runtime_block = ""
         super().__init__(*args, **kwargs)
 
     def add(self, *mobjects):
@@ -80,6 +81,10 @@ class InstrumentedScene(MovingCameraScene):
         title_mobject.to_edge(UP)
         self.play(Write(title_mobject))
         return title_mobject
+
+    def set_runtime_block(self, block_id: str):
+        self.current_runtime_block = str(block_id)
+        return self.current_runtime_block
 
     def safe_focus(self, *mobjects, margin: float = 0.75, animate: bool = True):
         if not mobjects:
@@ -147,6 +152,7 @@ class InstrumentedScene(MovingCameraScene):
                 {
                     "step": snapshot.step,
                     "event": event,
+                    "block_id": snapshot.block_id,
                     "report": build_bbox_report(self, self.object_registry),
                 }
             )
@@ -154,6 +160,7 @@ class InstrumentedScene(MovingCameraScene):
             {
                 "step": snapshot.step,
                 "event": event,
+                "block_id": snapshot.block_id,
                 "issues": lint_snapshot(snapshot),
             }
         )
@@ -161,7 +168,8 @@ class InstrumentedScene(MovingCameraScene):
             {
                 "step": snapshot.step,
                 "event": event,
-                "issues": lint_scene_connections(self),
+                "block_id": snapshot.block_id,
+                "issues": lint_scene_connections(self, self.object_registry),
             }
         )
         self.gc_plans = plan_gc_actions(self.scene_snapshots)

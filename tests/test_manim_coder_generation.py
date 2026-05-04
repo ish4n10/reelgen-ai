@@ -26,30 +26,6 @@ RUNTIME_IMPORT = (
 )
 
 
-RUNTIME_PROMPT = (
-    "Use ReelaiGen runtime middleware.\n"
-    f"Include this import exactly: {RUNTIME_IMPORT}\n"
-    "InstrumentedScene is observer-first. It records bbox diagnostics, collisions, off-frame objects, pacing, and scene diffs.\n"
-    "Do not rely on the runtime to redesign the scene for you.\n"
-    "You may use raw Manim primitives for creative, colorful, expressive visuals.\n"
-    "Do not use ReelaiGen wrapper mobjects or wrapper layout helpers.\n"
-    "Use plain Manim primitives such as Text, Rectangle, VGroup, Line, Arrow, Axes, NumberPlane, and Surface.\n"
-    "Build formulas and matrix-like layouts with plain Text, Line, Rectangle, and VGroup.\n"
-    "Avoid Manim Matrix unless LaTeX is explicitly available, because Matrix uses MathTex internally.\n"
-    "The generated scene class must inherit from InstrumentedScene.\n"
-    "Do not inherit directly from Scene, ThreeDScene, MovingCameraScene, or ZoomedScene.\n"
-    "InstrumentedScene observes after add() and play().\n"
-    "It detects overlap, off-screen objects, clutter, arrow drift, camera issues, and slow pacing.\n"
-    "It records layout_repairs, connection_repairs, camera_repairs, timing_repairs, and gc_plans.\n"
-    "Prefer Text for normal labels and only use MathTex when LaTeX is required.\n"
-    "Keep text blocks short, centered, and scaled to fit the frame when needed.\n"
-    "At the end of construct, call report = self.get_runtime_report().\n"
-    "Print a compact runtime summary, not the full report.\n"
-    "The summary should include snapshot_count, diff_count, bbox_collision_steps, bbox_out_of_frame_steps, layout_issue_steps, layout_repair_steps, "
-    "connection_repair_steps, camera_repair_steps, timing_repair_steps, and gc_plan_count.\n"
-)
-
-
 def load_vector_store():
     from langchain_community.vectorstores import FAISS
     from langchain_mistralai import MistralAIEmbeddings
@@ -87,19 +63,6 @@ def build_context(docs: list) -> str:
         )
 
     return "\n\n".join(blocks)
-
-
-def strip_code_fences(text: str) -> str:
-    cleaned = text.strip()
-    if cleaned.startswith("```"):
-        lines = cleaned.splitlines()
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        cleaned = "\n".join(lines).strip()
-    return cleaned
-
 
 def load_pipeline_sections(limit: int = 4) -> list[dict]:
     with SECTION_TEST_PATH.open("r", encoding="utf-8") as file:
@@ -157,9 +120,55 @@ def build_pipeline_prompt(sections: list[dict]) -> str:
     return json.dumps(blocks, indent=2, ensure_ascii=False)
 
 
+def build_scene_planning_context(sections: list[dict]) -> str:
+    lines = [
+        "Plan a production-quality educational Manim scene for the following sections.",
+        "Use the section order as the teaching order.",
+        "Treat the listed visual scenes as source material, not as a literal code template.",
+        "Prefer clean left-to-right educational layouts, consistent object sizes, and short labels.",
+        "",
+        build_pipeline_prompt(sections),
+    ]
+    return "\n".join(lines)
+
+
 def save_generated_manim_code(code: str) -> None:
     GENERATED_MANIM_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if "sys.path.insert" not in code:
+        bootstrap = (
+            "import sys\n"
+            "from pathlib import Path\n\n"
+            "sys.path.insert(0, str(Path(__file__).resolve().parents[2] / \"src\"))\n\n"
+        )
+        code = bootstrap + code
     GENERATED_MANIM_PATH.write_text(code, encoding="utf-8")
+
+
+def assert_scene_ir_generation_result(test_case: unittest.TestCase, result: dict, generated_code: str, scene_name: str) -> None:
+    test_case.assertIn("scene_ir", result)
+    test_case.assertIn("scene_ir_validation", result)
+    test_case.assertIn("planning_attempts", result)
+    test_case.assertIn("repair_attempts", result)
+    test_case.assertIn("planning_failed", result)
+
+    scene_ir = result["scene_ir"]
+    validation = result["scene_ir_validation"]
+
+    test_case.assertEqual(scene_ir["scene_name"], scene_name)
+    test_case.assertIn("objects", scene_ir)
+    test_case.assertIn("animation_blocks", scene_ir)
+    test_case.assertTrue(scene_ir["objects"])
+    test_case.assertTrue(scene_ir["animation_blocks"])
+
+    test_case.assertFalse(result["planning_failed"], msg=f"Scene IR planning failed: {validation}")
+    test_case.assertTrue(validation["passed"], msg=f"Scene IR validation failed: {validation}")
+    test_case.assertIn("from manim import *", generated_code)
+    test_case.assertIn(RUNTIME_IMPORT, generated_code)
+    test_case.assertIn("InstrumentedScene", generated_code)
+    test_case.assertIn("set_runtime_block", generated_code)
+    test_case.assertIn("get_runtime_report", generated_code)
+    test_case.assertIn("class ", generated_code)
+    test_case.assertIn("def construct", generated_code)
 
 
 class ManimCoderGenerationTests(unittest.TestCase):
@@ -184,48 +193,42 @@ class ManimCoderGenerationTests(unittest.TestCase):
         )
         docs = vector_store.similarity_search(query, k=3)
         context = build_context(docs)
+        planning_context = (
+            "Build a single educational scene about spacetime curvature near a black hole.\n"
+            "The scene should show axes, a curved gravity-well style surface, and gentle camera motion.\n"
+            "Keep the layout readable and production-oriented.\n"
+            "Use short labels and explicit scene blocks.\n"
+        )
 
         llm = get_mistral_llm()
         agent = ManimCoderAgent(llm=llm)
-        system_prompt = (
-            "You are a Manim code generator.\n"
-            "Use the retrieved examples as API grounding.\n"
-            "Write one runnable Manim file.\n"
-            "The scene should feel like a spacetime curvature or black hole visualization.\n"
-            "Name the scene class GeneratedBlackHoleScene.\n"
-            f"{RUNTIME_PROMPT}"
-            "Return code only."
-        )
-        user_prompt = (
-            f"User request:\n{query}\n\n"
-            f"Retrieved examples:\n{context}\n\n"
-            "Write a complete Manim Python example with imports and one scene class.\n"
-            "Prefer a 3D surface that looks like a gravity well or curved spacetime.\n"
-            "Include axes and gentle camera movement.\n"
-            "Because InstrumentedScene is based on Scene, avoid ThreeDScene-only methods unless you also explain them through normal mobjects."
-        )
-        result = agent.generate_with_repair(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
+        result = agent.generate_from_planning_context_with_repair(
             scene_name="GeneratedBlackHoleScene",
-            max_retries=2,
+            scene_goal="Explain a black-hole-style spacetime curvature scene.",
+            planning_context=planning_context,
+            retrieval_context=context,
+            max_replans=2,
+            max_repairs=2,
+            source_context={"query": query},
         )
         generated_code = result["final_code"]
 
+        print("\nScene IR:\n")
+        print(json.dumps(result["scene_ir"], indent=2))
         print("\nRetrieved examples context:\n")
         print(context)
         print("\nGenerated Manim code:\n")
         print(generated_code)
         print("\nDiagnostics summary:\n")
         print(json.dumps(result["final_diagnostics"], indent=2))
+        print("\nScene IR validation:\n")
+        print(json.dumps(result["scene_ir_validation"], indent=2))
+
+        if result.get("planning_failed"):
+            self.fail(f"Scene IR planning failed: {json.dumps(result['scene_ir_validation'], indent=2)}")
 
         self.assertTrue(generated_code.strip())
-        self.assertIn("from manim import *", generated_code)
-        self.assertIn(RUNTIME_IMPORT, generated_code)
-        self.assertIn("InstrumentedScene", generated_code)
-        self.assertIn("get_runtime_report", generated_code)
-        self.assertIn("class ", generated_code)
-        self.assertIn("def construct", generated_code)
+        assert_scene_ir_generation_result(self, result, generated_code, "GeneratedBlackHoleScene")
 
 
 class PipelineTests(unittest.TestCase):
@@ -248,6 +251,7 @@ class PipelineTests(unittest.TestCase):
         sections = load_pipeline_sections(limit=4)
         query = build_pipeline_query(sections)
         pipeline_prompt = build_pipeline_prompt(sections)
+        planning_context = build_scene_planning_context(sections)
 
         vector_store = load_vector_store()
         docs = vector_store.similarity_search(query, k=4)
@@ -255,39 +259,19 @@ class PipelineTests(unittest.TestCase):
 
         llm = get_mistral_llm()
         agent = ManimCoderAgent(llm=llm)
-        system_prompt = (
-            "You are a Manim code generator.\n"
-            "You receive pipeline sections from an educational video system.\n"
-            "Use the retrieved examples as API grounding.\n"
-            "The section visual.scenes data is the source of truth for what to animate.\n"
-            "Follow each scene storyboard, objects, equations, transitions, camera_moves, and manim_primitives.\n"
-            "Write one runnable Manim Python file.\n"
-            "Name the scene class GeneratedSectionScene.\n"
-            f"{RUNTIME_PROMPT}"
-            "Return code only."
-        )
-        user_prompt = (
-            f"Pipeline sections:\n{pipeline_prompt}\n\n"
-            f"Retrieval query:\n{query}\n\n"
-            f"Retrieved examples:\n{context}\n\n"
-            "Generate one Manim scene that explains these first sections in order.\n"
-            "Use section targets as chapter titles.\n"
-            "Use narration to decide what labels and animation beats should appear.\n"
-            "Use visual concepts to choose objects.\n"
-            "Use visual equations to decide formulas using plain Manim text-based layouts.\n"
-            "Use visual transitions and camera_moves as animation instructions.\n"
-            "Keep it educational, readable, and grounded in the provided pipeline data.\n"
-            "Use InstrumentedScene so the runtime middleware records layout snapshots and linter reports."
-        )
-        result = agent.generate_with_repair(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
+        result = agent.generate_from_planning_context_with_repair(
             scene_name="GeneratedSectionScene",
-            max_retries=2,
+            scene_goal="Explain the first transformer attention sections in order.",
+            planning_context=planning_context,
+            retrieval_context=context,
+            max_replans=2,
+            max_repairs=2,
+            source_context={"sections": sections, "query": query},
         )
         generated_code = result["final_code"]
-        save_generated_manim_code(generated_code)
 
+        print("\nScene IR:\n")
+        print(json.dumps(result["scene_ir"], indent=2))
         print("\nPipeline sections prompt:\n")
         print(pipeline_prompt)
         print("\nRetrieved examples context:\n")
@@ -296,16 +280,18 @@ class PipelineTests(unittest.TestCase):
         print(generated_code)
         print("\nDiagnostics summary:\n")
         print(json.dumps(result["final_diagnostics"], indent=2))
+        print("\nScene IR validation:\n")
+        print(json.dumps(result["scene_ir_validation"], indent=2))
+
+        if result.get("planning_failed"):
+            self.fail(f"Scene IR planning failed: {json.dumps(result['scene_ir_validation'], indent=2)}")
+
+        save_generated_manim_code(generated_code)
         print(f"\nSaved generated Manim code to: {GENERATED_MANIM_PATH}\n")
 
         self.assertTrue(generated_code.strip())
-        self.assertIn("from manim import *", generated_code)
-        self.assertIn(RUNTIME_IMPORT, generated_code)
-        self.assertIn("InstrumentedScene", generated_code)
         self.assertIn("GeneratedSectionScene", generated_code)
-        self.assertIn("get_runtime_report", generated_code)
-        self.assertIn("class ", generated_code)
-        self.assertIn("def construct", generated_code)
+        assert_scene_ir_generation_result(self, result, generated_code, "GeneratedSectionScene")
 
 
 if __name__ == "__main__":

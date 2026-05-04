@@ -8,772 +8,396 @@ from reelaigen.agents.manim_coder.runtime import InstrumentedScene
 
 class GeneratedSectionScene(InstrumentedScene):
     def construct(self):
-        # ===== SECTION 0: Introduction to Scaled Dot-Product Attention =====
-        self.section_0_intro()
-        self.section_0_matrices()
-        self.section_0_softmax()
+        # Block: intro_title
+        self.block_intro_title()
 
-        # ===== SECTION 1: Computing attention function on matrices =====
-        self.section_1_matrices()
-        self.section_1_attention_computation()
+        # Block: section0_intro
+        self.block_section0_intro()
 
-        # ===== SECTION 2: Comparison of attention functions =====
-        self.section_2_intro()
-        self.section_2_dot_product()
-        self.section_2_additive()
-        self.section_2_comparison()
+        # Block: section0_dot_product_flow
+        self.block_section0_dot_product_flow()
 
-        # ===== SECTION 3: Scaling dot products for large dk =====
-        self.section_3_split_screen()
-        self.section_3_matrices()
-        self.section_3_scaling()
-        self.section_3_multihead()
+        # Block: section1_intro_matrices
+        self.block_section1_intro_matrices()
 
-        # Runtime report
+        # Block: section1_attention_equation
+        self.block_section1_attention_equation()
+
+        # Block: section2_intro_comparison
+        self.block_section2_intro_comparison()
+
+        # Block: section2_connectors_and_table
+        self.block_section2_connectors_and_table()
+
+        # Block: section3_multi_head_intro
+        self.block_section3_multi_head_intro()
+
+        # Block: section3_parallel_and_equation
+        self.block_section3_parallel_and_equation()
+
+        # Block: final_zoom_out
+        self.block_final_zoom_out()
+
         report = self.get_runtime_report()
-        print(f"Runtime Summary: "
-              f"snapshots={report['snapshot_count']}, "
-              f"diffs={report['diff_count']}, "
-              f"bbox_collisions={report['bbox_collision_steps']}, "
-              f"out_of_frame={report['bbox_out_of_frame_steps']}, "
-              f"layout_issues={report['layout_issue_steps']}, "
-              f"layout_repairs={report['layout_repair_steps']}, "
-              f"connection_repairs={report['connection_repair_steps']}, "
-              f"camera_repairs={report['camera_repair_steps']}, "
-              f"timing_repairs={report['timing_repair_steps']}, "
-              f"gc_plans={report['gc_plan_count']}")
+        print(
+            "Runtime Report: "
+            f"snapshots={report['snapshot_count']}, "
+            f"diffs={report['diff_count']}, "
+            f"bbox_collisions={report['bbox_collision_steps']}, "
+            f"bbox_out_of_frame={report['bbox_out_of_frame_steps']}, "
+            f"layout_issues={report['layout_issue_steps']}, "
+            f"connection_issues={report['connection_issue_steps']}, "
+            f"gc_plans={report['gc_plan_count']}"
+        )
 
-    # ===== SECTION 0 METHODS =====
-    def section_0_intro(self):
-        # Title
-        title = Text("Scaled Dot-Product Attention", font_size=40)
-        title.to_edge(UP)
-
-        # Diagram placeholder (simplified representation)
-        q_box = Rectangle(height=1.2, width=1.5, color=BLUE, fill_opacity=0.3)
-        k_box = Rectangle(height=1.2, width=1.5, color=GREEN, fill_opacity=0.3)
-        v_box = Rectangle(height=1.2, width=1.5, color=RED, fill_opacity=0.3)
-
-        q_label = Text("Q", font_size=24).move_to(q_box)
-        k_label = Text("K", font_size=24).move_to(k_box)
-        v_label = Text("V", font_size=24).move_to(v_box)
-
-        diagram = VGroup(q_box, k_box, v_box).arrange(RIGHT, buff=0.8)
-        diagram_labels = VGroup(q_label, k_label, v_label)
-
-        # Position diagram below title
-        diagram.next_to(title, DOWN, buff=1)
-        diagram_labels.move_to(diagram)
-
-        # Animation sequence
-        self.play(Write(title))
+    def block_intro_title(self):
+        self.set_runtime_block('intro_title')
+        self.main_title = Text("Transformer Attention", font="Sans Serif", weight=BOLD, slant=ITALIC, color=BLUE_A)
+        self.main_title.scale_to_fit_width(4.5).move_to([0.0, 3.25, 0])
+        self.main_title._reelaigen_id = 'main_title'
+        self.play(FadeIn(self.main_title))
         self.wait(0.5)
+
+    def block_section0_intro(self):
+        self.set_runtime_block('section0_intro')
+        self.section0_title = Text("1. Scaled Dot-Product", color=YELLOW_A)
+        self.section0_title.scale_to_fit_width(4.0).move_to([-4.76, 3.0, 0])
+        self.section0_title._reelaigen_id = 'section0_title'
+
+        # Create matrices with consistent size and labels below them
+        matrix_width = 1.2
+        matrix_height = 1.2
+        label_offset = 0.7
+
+        self.q_matrix_section0 = Rectangle(width=matrix_width, height=matrix_height, color=GREEN_B, fill_opacity=0.5, stroke_width=2.0)
+        self.q_matrix_section0.move_to([-4.76, 1.5, 0])
+        self.q_matrix_section0._reelaigen_id = 'q_matrix_section0'
+
+        self.q_label_section0 = Text("Query", color=WHITE).scale(0.4).move_to([-4.76, 1.5 - label_offset, 0])
+        self.q_label_section0._reelaigen_id = 'q_label_section0'
+
+        self.k_matrix_section0 = Rectangle(width=matrix_width, height=matrix_height, color=RED_B, fill_opacity=0.5, stroke_width=2.0)
+        self.k_matrix_section0.move_to([-2.76, 1.5, 0])
+        self.k_matrix_section0._reelaigen_id = 'k_matrix_section0'
+
+        self.k_label_section0 = Text("Key", color=WHITE).scale(0.4).move_to([-2.76, 1.5 - label_offset, 0])
+        self.k_label_section0._reelaigen_id = 'k_label_section0'
+
+        self.v_matrix_section0 = Rectangle(width=matrix_width, height=matrix_height, color=BLUE_B, fill_opacity=0.5, stroke_width=2.0)
+        self.v_matrix_section0.move_to([-0.76, 1.5, 0])
+        self.v_matrix_section0._reelaigen_id = 'v_matrix_section0'
+
+        self.v_label_section0 = Text("Value", color=WHITE).scale(0.4).move_to([-0.76, 1.5 - label_offset, 0])
+        self.v_label_section0._reelaigen_id = 'v_label_section0'
+
+        self.play(Write(self.section0_title))
         self.play(
-            LaggedStart(
-                FadeIn(q_box, shift=LEFT),
-                FadeIn(k_box),
-                FadeIn(v_box, shift=RIGHT),
-                lag_ratio=0.3
-            )
-        )
-        self.play(Write(diagram_labels))
-        self.wait(1)
-
-        # Camera zoom
-        self.play(
-            self.camera.frame.animate.scale(0.8).move_to(diagram)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(diagram),
-            FadeOut(diagram_labels),
-            title.animate.to_edge(UP)
-        )
-
-    def section_0_matrices(self):
-        # Create matrices with consistent dimensions
-        q_matrix = self.create_matrix_label("Q", BLUE)
-        k_matrix = self.create_matrix_label("K", GREEN)
-        v_matrix = self.create_matrix_label("V", RED)
-
-        # Arrange matrices with consistent spacing
-        matrices = VGroup(q_matrix, k_matrix, v_matrix).arrange(RIGHT, buff=1.2)
-        matrices.to_edge(DOWN, buff=1)
-
-        # Arrows between matrices (horizontal only)
-        qk_arrow = Arrow(
-            q_matrix.get_right() + UP*0.2,
-            k_matrix.get_left() + UP*0.2,
-            buff=0.1,
-            color=YELLOW
-        )
-        kv_arrow = Arrow(
-            k_matrix.get_right() + DOWN*0.2,
-            v_matrix.get_left() + DOWN*0.2,
-            buff=0.1,
-            color=YELLOW
-        )
-
-        # Animation sequence
-        self.play(
-            LaggedStart(
-                *[Create(matrix[0]) for matrix in matrices],
-                lag_ratio=0.3
-            )
-        )
-        self.play(
-            LaggedStart(
-                *[Write(matrix[4]) for matrix in matrices],
-                lag_ratio=0.3
-            )
+            FadeIn(self.q_matrix_section0),
+            FadeIn(self.k_matrix_section0),
+            FadeIn(self.v_matrix_section0),
+            FadeIn(self.q_label_section0),
+            FadeIn(self.k_label_section0),
+            FadeIn(self.v_label_section0)
         )
         self.wait(0.5)
 
+    def block_section0_dot_product_flow(self):
+        self.set_runtime_block('section0_dot_product_flow')
+        self.dot_product_section0 = Text("Q x K^T", color=WHITE).scale(0.5).move_to([0.5, 1.5, 0])
+        self.dot_product_section0._reelaigen_id = 'dot_product_section0'
+
+        # Use Text instead of MathTex to avoid rendering issues
+        self.scale_factor_section0 = Text("1/sqrt(d_k)", color=YELLOW_D).scale(0.5).move_to([2.0, 1.5, 0])
+        self.scale_factor_section0._reelaigen_id = 'scale_factor_section0'
+
+        self.softmax_section0 = Text("softmax", color=PURPLE_B).scale(0.5).move_to([3.5, 1.5, 0])
+        self.softmax_section0._reelaigen_id = 'softmax_section0'
+
+        self.output_section0 = Rectangle(width=1.5, height=1.2, color=GREEN_C, fill_opacity=0.5, stroke_width=2.0)
+        self.output_section0.move_to([5.5, 0.98, 0])
+        self.output_section0._reelaigen_id = 'output_section0'
+
+        self.output_label_section0 = Text("Attention", color=WHITE).scale(0.4).move_to([5.5, 2.02, 0])
+        self.output_label_section0._reelaigen_id = 'output_label_section0'
+
         self.play(
-            GrowArrow(qk_arrow),
-            GrowArrow(kv_arrow)
+            GrowFromEdge(self.dot_product_section0, LEFT),
+            GrowFromEdge(self.scale_factor_section0, LEFT),
+            GrowFromEdge(self.softmax_section0, LEFT),
+            DrawBorderThenFill(self.output_section0),
+            Write(self.output_label_section0)
         )
-        self.wait(1)
 
-        # Camera pan
-        self.play(
-            self.camera.frame.animate.shift(DOWN*0.5)
+        # Connectors with proper anchoring and routing
+        self.q_to_dot_product_section0 = Line(
+            self.q_matrix_section0.get_right() + RIGHT * 0.1,
+            self.dot_product_section0.get_left() + LEFT * 0.1,
+            color=GREEN_D,
+            stroke_width=2.0
         )
-        self.wait(1)
+        self.q_to_dot_product_section0._reelaigen_id = 'q_to_dot_product_section0'
 
-        # Cleanup
-        self.play(
-            FadeOut(qk_arrow),
-            FadeOut(kv_arrow),
-            FadeOut(matrices)
+        self.k_to_dot_product_section0 = Line(
+            self.k_matrix_section0.get_right() + RIGHT * 0.1,
+            self.dot_product_section0.get_left() + LEFT * 0.1 + DOWN * 0.3,
+            color=RED_D,
+            stroke_width=2.0
         )
+        self.k_to_dot_product_section0._reelaigen_id = 'k_to_dot_product_section0'
 
-    def section_0_softmax(self):
-        # Mathematical expression using Text
-        sqrt_dk = Text("√dₖ", font_size=40)
-        divide_expr = VGroup(
-            Text("Divide by", font_size=24),
-            sqrt_dk
-        ).arrange(DOWN, buff=0.3)
+        self.dot_product_to_scale_section0 = Line(
+            self.dot_product_section0.get_right() + RIGHT * 0.1,
+            self.scale_factor_section0.get_left() + LEFT * 0.1,
+            color=YELLOW_D,
+            stroke_width=2.0
+        )
+        self.dot_product_to_scale_section0._reelaigen_id = 'dot_product_to_scale_section0'
 
-        softmax_text = Text("Softmax", font_size=28)
-        softmax_circle = Circle(radius=0.9, color=PURPLE)
-        softmax_circle.surround(softmax_text)
-        softmax_circle.scale(1.15)
-        softmax_group = VGroup(softmax_circle, softmax_text)
+        self.scale_to_softmax_section0 = Line(
+            self.scale_factor_section0.get_right() + RIGHT * 0.1,
+            self.softmax_section0.get_left() + LEFT * 0.1,
+            color=PURPLE_C,
+            stroke_width=2.0
+        )
+        self.scale_to_softmax_section0._reelaigen_id = 'scale_to_softmax_section0'
 
-        weights_text = Text("Weights on values", font_size=28)
+        self.softmax_to_v_section0 = Line(
+            self.softmax_section0.get_bottom() + DOWN * 0.1,
+            self.v_matrix_section0.get_top() + UP * 0.1,
+            color=BLUE_D,
+            stroke_width=2.0
+        ).add_tip(tip_length=0.15)
+        self.softmax_to_v_section0._reelaigen_id = 'softmax_to_v_section0'
 
-        # Position elements with proper spacing
-        divide_expr.to_edge(LEFT, buff=1.5)
-        softmax_group.next_to(divide_expr, RIGHT, buff=1.5)
-        weights_text.next_to(softmax_group, RIGHT, buff=1.5)
+        self.v_to_output_section0 = Line(
+            self.v_matrix_section0.get_right() + RIGHT * 0.1,
+            self.output_section0.get_left() + LEFT * 0.1,
+            color=WHITE,
+            stroke_width=2.0
+        )
+        self.v_to_output_section0._reelaigen_id = 'v_to_output_section0'
 
-        # Animation sequence
         self.play(
-            FadeIn(divide_expr)
+            Create(self.q_to_dot_product_section0),
+            Create(self.k_to_dot_product_section0),
+            Create(self.dot_product_to_scale_section0),
+            Create(self.scale_to_softmax_section0),
+            Create(self.softmax_to_v_section0),
+            Create(self.v_to_output_section0)
         )
         self.wait(0.5)
 
+    def block_section1_intro_matrices(self):
+        self.set_runtime_block('section1_intro_matrices')
+        self.section1_title = Text("2. Matrix Computation", color=YELLOW_A)
+        self.section1_title.scale_to_fit_width(4.0).move_to([-4.76, -0.5, 0])
+        self.section1_title._reelaigen_id = 'section1_title'
+
+        # Use Text instead of MathTex to avoid rendering issues
+        self.q_matrix_section1 = Text("Q", color=GREEN_B, font="Sans Serif", weight=BOLD).scale(2.0).move_to([-3.76, -2.0, 0])
+        self.q_matrix_section1._reelaigen_id = 'q_matrix_section1'
+
+        self.k_matrix_section1 = Text("K", color=RED_B, font="Sans Serif", weight=BOLD).scale(2.0).move_to([-0.76, -2.0, 0])
+        self.k_matrix_section1._reelaigen_id = 'k_matrix_section1'
+
+        self.v_matrix_section1 = Text("V", color=BLUE_B, font="Sans Serif", weight=BOLD).scale(2.0).move_to([2.24, -2.0, 0])
+        self.v_matrix_section1._reelaigen_id = 'v_matrix_section1'
+
+        self.play(Write(self.section1_title))
         self.play(
-            DrawBorderThenFill(softmax_circle),
-            Write(softmax_text)
+            FadeIn(self.q_matrix_section1),
+            FadeIn(self.k_matrix_section1),
+            FadeIn(self.v_matrix_section1)
         )
         self.wait(0.5)
 
+    def block_section1_attention_equation(self):
+        self.set_runtime_block('section1_attention_equation')
+        self.attention_equation_section1 = Text(
+            "Attention(Q,K,V) = softmax((Q K^T)/sqrt(d_k)) V",
+            color=YELLOW_D
+        ).scale(0.4).scale_to_fit_width(7.0).move_to([0.0, -3.25, 0])
+        self.attention_equation_section1._reelaigen_id = 'attention_equation_section1'
+
+        self.play(Write(self.attention_equation_section1))
+
+        # Connectors
+        self.q_to_equation_section1 = Line(
+            self.q_matrix_section1.get_bottom() + DOWN * 0.1,
+            self.attention_equation_section1.get_top() + [-2.0, 0.5, 0],
+            color=GREEN_D,
+            stroke_width=1.5
+        ).add_tip(tip_length=0.1)
+        self.q_to_equation_section1._reelaigen_id = 'q_to_equation_section1'
+
+        self.k_to_equation_section1 = Line(
+            self.k_matrix_section1.get_bottom() + DOWN * 0.1,
+            self.attention_equation_section1.get_top() + [0.0, 0.5, 0],
+            color=RED_D,
+            stroke_width=1.5
+        ).add_tip(tip_length=0.1)
+        self.k_to_equation_section1._reelaigen_id = 'k_to_equation_section1'
+
+        self.v_to_equation_section1 = Line(
+            self.v_matrix_section1.get_bottom() + DOWN * 0.1,
+            self.attention_equation_section1.get_top() + [2.0, 0.5, 0],
+            color=BLUE_D,
+            stroke_width=1.5
+        ).add_tip(tip_length=0.1)
+        self.v_to_equation_section1._reelaigen_id = 'v_to_equation_section1'
+
         self.play(
-            Write(weights_text)
-        )
-        self.wait(1)
-
-        # Zoom on expression
-        self.play(
-            self.camera.frame.animate.scale(0.7).move_to(divide_expr)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(divide_expr),
-            FadeOut(softmax_group),
-            FadeOut(weights_text)
-        )
-
-    # ===== SECTION 1 METHODS =====
-    def section_1_matrices(self):
-        # Section title
-        section_title = Text("Computing Attention on Matrices", font_size=36)
-        section_title.to_edge(UP)
-
-        # Create matrices with consistent dimensions
-        q_matrix = self.create_matrix_label("Q", BLUE)
-        k_matrix = self.create_matrix_label("K", GREEN)
-        v_matrix = self.create_matrix_label("V", RED)
-
-        matrices = VGroup(q_matrix, k_matrix, v_matrix).arrange(RIGHT, buff=1.2)
-
-        # Animation sequence
-        self.play(
-            Write(section_title)
+            Create(self.q_to_equation_section1),
+            Create(self.k_to_equation_section1),
+            Create(self.v_to_equation_section1)
         )
         self.wait(0.5)
 
+    def block_section2_intro_comparison(self):
+        self.set_runtime_block('section2_intro_comparison')
+        self.section2_title = Text("3. Attention Comparison", color=YELLOW_A)
+        self.section2_title.scale_to_fit_width(4.0).move_to([0.0, 3.0, 0])
+        self.section2_title._reelaigen_id = 'section2_title'
+
+        self.dot_product_attention_section2 = Text("Dot-Product", color=GREEN_C).scale(0.5).move_to([-3.0, 1.5, 0])
+        self.dot_product_attention_section2._reelaigen_id = 'dot_product_attention_section2'
+
+        self.dot_product_equation_section2 = Text("(Q K^T)/sqrt(d_k)", color=WHITE).scale(0.45).move_to([-3.0, 0.5, 0])
+        self.dot_product_equation_section2._reelaigen_id = 'dot_product_equation_section2'
+
+        self.additive_attention_section2 = Text("Additive", color=RED_C).scale(0.5).move_to([3.0, 1.5, 0])
+        self.additive_attention_section2._reelaigen_id = 'additive_attention_section2'
+
+        self.ff_network_section2 = Rectangle(width=2.0, height=1.0, color=BLUE_C, fill_opacity=0.5, stroke_width=2.0)
+        self.ff_network_section2.move_to([3.0, -0.47, 0])
+        self.ff_network_section2._reelaigen_id = 'ff_network_section2'
+
+        self.ff_label_section2 = Text("Single Layer", color=WHITE).scale(0.4).move_to([3.0, 0.47, 0])
+        self.ff_label_section2._reelaigen_id = 'ff_label_section2'
+
+        self.play(Write(self.section2_title))
         self.play(
-            LaggedStart(
-                *[Create(matrix[0]) for matrix in matrices],
-                lag_ratio=0.3
-            )
+            FadeIn(self.dot_product_attention_section2),
+            FadeIn(self.dot_product_equation_section2),
+            FadeIn(self.additive_attention_section2),
+            DrawBorderThenFill(self.ff_network_section2),
+            Write(self.ff_label_section2)
         )
+        self.wait(0.5)
+
+    def block_section2_connectors_and_table(self):
+        self.set_runtime_block('section2_connectors_and_table')
+        self.comparison_table_section2 = Rectangle(width=6.0, height=2.0, color=GRAY_BROWN, fill_opacity=0.3, stroke_width=2.0)
+        self.comparison_table_section2.move_to([0.0, -2.65, 0])
+        self.comparison_table_section2._reelaigen_id = 'comparison_table_section2'
+
+        self.comparison_title_section2 = Text("Efficiency", color=YELLOW_D).scale(0.5).move_to([0.0, -0.52, 0])
+        self.comparison_title_section2._reelaigen_id = 'comparison_title_section2'
+
+        self.dot_product_pros_section2 = Text("Faster", color=GREEN_D).scale(0.4).move_to([-2.0, -1.44, 0])
+        self.dot_product_pros_section2._reelaigen_id = 'dot_product_pros_section2'
+
+        self.additive_pros_section2 = Text("Flexible", color=GREEN_D).scale(0.4).move_to([2.0, -1.44, 0])
+        self.additive_pros_section2._reelaigen_id = 'additive_pros_section2'
+
         self.play(
-            LaggedStart(
-                *[Write(matrix[4]) for matrix in matrices],
-                lag_ratio=0.3
-            )
+            DrawBorderThenFill(self.comparison_table_section2),
+            Write(self.comparison_title_section2),
+            Write(self.dot_product_pros_section2),
+            Write(self.additive_pros_section2)
         )
-        self.wait(1)
 
-        # Zoom on each matrix
-        for matrix in matrices:
-            self.play(
-                self.camera.frame.animate.move_to(matrix).scale(0.8)
-            )
-            self.wait(0.5)
+        # Connectors
+        self.dot_product_to_equation_section2 = Line(
+            self.dot_product_equation_section2.get_top() + UP * 0.1,
+            self.dot_product_attention_section2.get_bottom() + DOWN * 0.1,
+            color=GREEN_D,
+            stroke_width=1.5
+        )
+        self.dot_product_to_equation_section2._reelaigen_id = 'dot_product_to_equation_section2'
 
-        # Cleanup
+        self.ff_to_additive_section2 = Line(
+            self.ff_network_section2.get_top() + UP * 0.1,
+            self.additive_attention_section2.get_bottom() + DOWN * 0.1,
+            color=RED_D,
+            stroke_width=1.5
+        )
+        self.ff_to_additive_section2._reelaigen_id = 'ff_to_additive_section2'
+
         self.play(
-            FadeOut(matrices),
-            section_title.animate.to_edge(UP)
+            Create(self.dot_product_to_equation_section2),
+            Create(self.ff_to_additive_section2)
         )
+        self.wait(0.5)
 
-    def section_1_attention_computation(self):
-        # Attention formula
-        attention_formula = Text("Attention(Q, K, V) = softmax(QKᵀ/√dₖ)V", font_size=36)
+    def block_section3_multi_head_intro(self):
+        self.set_runtime_block('section3_multi_head_intro')
+        self.section3_title = Text("4. Multi-Head Attention", color=YELLOW_A)
+        self.section3_title.scale_to_fit_width(4.0).move_to([3.26, 3.0, 0])
+        self.section3_title._reelaigen_id = 'section3_title'
 
-        # Matrices with consistent dimensions
-        q_matrix = self.create_matrix_label("Q", BLUE).scale(0.7)
-        k_matrix = self.create_matrix_label("K", GREEN).scale(0.7)
-        v_matrix = self.create_matrix_label("V", RED).scale(0.7)
+        self.scaled_dot_product_section3 = Rectangle(width=3.0, height=2.0, color=BLUE_D, fill_opacity=0.3, stroke_width=2.0)
+        self.scaled_dot_product_section3.move_to([1.26, 1.0, 0])
+        self.scaled_dot_product_section3._reelaigen_id = 'scaled_dot_product_section3'
 
-        # Arrange elements with proper spacing
-        matrices = VGroup(q_matrix, k_matrix, v_matrix).arrange(RIGHT, buff=0.8)
-        attention_formula.next_to(matrices, DOWN, buff=1.2)
+        self.multi_head_section3 = Rectangle(width=3.0, height=2.0, color=GREEN_D, fill_opacity=0.3, stroke_width=2.0)
+        self.multi_head_section3.move_to([5.26, 1.0, 0])
+        self.multi_head_section3._reelaigen_id = 'multi_head_section3'
 
-        # Arrows for computation flow (horizontal only)
-        qk_arrow = Arrow(
-            q_matrix.get_right() + UP*0.1,
-            k_matrix.get_left() + UP*0.1,
-            buff=0.1,
-            color=YELLOW
+        self.play(
+            FadeIn(self.section3_title),
+            DrawBorderThenFill(self.scaled_dot_product_section3),
+            DrawBorderThenFill(self.multi_head_section3)
         )
-        kv_arrow = Arrow(
-            k_matrix.get_right() + DOWN*0.1,
-            v_matrix.get_left() + DOWN*0.1,
-            buff=0.1,
-            color=YELLOW
+        self.wait(0.5)
+
+    def block_section3_parallel_and_equation(self):
+        self.set_runtime_block('section3_parallel_and_equation')
+        self.parallel_arrows_section3 = DashedLine(
+            [2.76, 1.0, 0],
+            [4.76, 1.0, 0],
+            color=YELLOW_D,
+            stroke_width=2.0,
+            dash_length=0.1
         )
-        result_arrow = Arrow(
-            matrices.get_bottom(),
-            attention_formula.get_top(),
-            buff=0.2,
+        self.parallel_arrows_section3.add_tip(tip_length=0.2)
+        self.parallel_arrows_section3._reelaigen_id = 'parallel_arrows_section3'
+
+        self.parallel_arrows_label_section3 = Text("Parallel", color=YELLOW_D).scale(0.4).move_to([2.76, 1.8, 0])
+        self.parallel_arrows_label_section3._reelaigen_id = 'parallel_arrows_label_section3'
+
+        self.multi_head_equation_section3 = Text(
+            "MultiHead(Q,K,V) = Concat(head_1, ..., head_h) W^O",
             color=WHITE
+        ).scale(0.35).scale_to_fit_width(7.0).move_to([3.26, -0.5, 0])
+        self.multi_head_equation_section3._reelaigen_id = 'multi_head_equation_section3'
+
+        self.subspace_text_section3 = Text("Different subspaces", color=PURPLE_C).scale(0.5).move_to([3.26, -1.5, 0])
+        self.subspace_text_section3._reelaigen_id = 'subspace_text_section3'
+
+        self.play(
+            Create(self.parallel_arrows_section3),
+            Write(self.parallel_arrows_label_section3),
+            Write(self.multi_head_equation_section3),
+            Write(self.subspace_text_section3)
         )
 
-        # Animation sequence
-        self.play(
-            LaggedStart(
-                *[Create(matrix[0]) for matrix in matrices],
-                lag_ratio=0.3
-            )
+        # Connector
+        self.scaled_to_multi_section3 = DashedLine(
+            self.scaled_dot_product_section3.get_right() + RIGHT * 0.1,
+            self.multi_head_section3.get_left() + LEFT * 0.1,
+            color=WHITE,
+            stroke_width=2.0,
+            dash_length=0.1
         )
-        self.play(
-            LaggedStart(
-                *[Write(matrix[4]) for matrix in matrices],
-                lag_ratio=0.3
-            )
-        )
+        self.scaled_to_multi_section3._reelaigen_id = 'scaled_to_multi_section3'
+
+        self.play(Create(self.scaled_to_multi_section3))
         self.wait(0.5)
 
+    def block_final_zoom_out(self):
+        self.set_runtime_block('final_zoom_out')
         self.play(
-            GrowArrow(qk_arrow),
-            GrowArrow(kv_arrow)
+            self.camera.frame.animate.set_width(16).move_to(ORIGIN)
         )
-        self.wait(0.5)
-
-        self.play(
-            Write(attention_formula)
-        )
-        self.play(
-            GrowArrow(result_arrow)
-        )
-        self.wait(1)
-
-        # Pan across elements
-        self.play(
-            self.camera.frame.animate.shift(DOWN*0.5)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(qk_arrow),
-            FadeOut(kv_arrow),
-            FadeOut(result_arrow),
-            FadeOut(matrices),
-            FadeOut(attention_formula)
-        )
-
-    # ===== SECTION 2 METHODS =====
-    def section_2_intro(self):
-        # Section title
-        section_title = Text("Comparison of Attention Functions", font_size=36)
-        section_title.to_edge(UP)
-
-        # Attention types with consistent formatting
-        additive = Text("• Additive Attention", font_size=30, t2c={"Additive": YELLOW})
-        dot_product = Text("• Dot-Product Attention", font_size=30, t2c={"Dot-Product": BLUE})
-
-        attention_types = VGroup(additive, dot_product).arrange(DOWN, aligned_edge=LEFT, buff=0.6)
-
-        # Animation sequence
-        self.play(
-            Write(section_title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(attention_types)
-        )
-        self.wait(1)
-
-        # Camera movements
-        self.play(
-            self.camera.frame.animate.scale(0.8).move_to(attention_types)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(attention_types),
-            section_title.animate.to_edge(UP)
-        )
-
-    def section_2_dot_product(self):
-        # Dot-product attention
-        dp_title = Text("Dot-Product Attention", font_size=32, color=BLUE)
-        scaling_factor = Text("Scaling Factor: 1/√dₖ", font_size=36)
-
-        # Position elements with proper spacing
-        dp_title.to_edge(UP)
-        scaling_factor.next_to(dp_title, DOWN, buff=1.2)
-
-        # Arrow pointing to scaling factor (vertical only)
-        arrow = Arrow(
-            dp_title.get_center() + DOWN*0.3,
-            scaling_factor.get_center() + UP*0.3,
-            buff=0.2,
-            color=BLUE
-        )
-
-        # Animation sequence
-        self.play(
-            Write(dp_title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            GrowArrow(arrow),
-            Write(scaling_factor)
-        )
-        self.wait(1)
-
-        # Focus on scaling factor
-        self.play(
-            self.camera.frame.animate.move_to(scaling_factor).scale(0.7)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(dp_title),
-            FadeOut(arrow),
-            FadeOut(scaling_factor)
-        )
-
-    def section_2_additive(self):
-        # Additive attention
-        aa_title = Text("Additive Attention", font_size=32, color=YELLOW)
-        ff_text = Text("Feed-Forward Network", font_size=28)
-        hidden_layer = Text("Single Hidden Layer", font_size=28)
-
-        # Create simple network diagram with proper spacing
-        input_circle = Circle(radius=0.3, color=WHITE)
-        hidden_circle = Circle(radius=0.3, color=WHITE)
-        output_circle = Circle(radius=0.3, color=WHITE)
-
-        input_circle.shift(LEFT*2)
-        output_circle.shift(RIGHT*2)
-        hidden_circle.move_to(ORIGIN)
-
-        input_to_hidden = Arrow(
-            input_circle.get_right(),
-            hidden_circle.get_left(),
-            buff=0.1
-        )
-        hidden_to_output = Arrow(
-            hidden_circle.get_right(),
-            output_circle.get_left(),
-            buff=0.1
-        )
-
-        network = VGroup(
-            input_circle, hidden_circle, output_circle,
-            input_to_hidden, hidden_to_output
-        )
-
-        # Position elements with proper spacing
-        aa_title.to_edge(UP)
-        network.next_to(aa_title, DOWN, buff=1.2)
-        ff_text.next_to(network, DOWN, buff=0.6)
-        hidden_layer.next_to(ff_text, DOWN, buff=0.4)
-
-        # Animation sequence
-        self.play(
-            Write(aa_title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            LaggedStart(
-                Create(input_circle),
-                Create(hidden_circle),
-                Create(output_circle),
-                lag_ratio=0.3
-            )
-        )
-        self.play(
-            GrowArrow(input_to_hidden),
-            GrowArrow(hidden_to_output)
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(ff_text)
-        )
-        self.play(
-            Write(hidden_layer)
-        )
-        self.wait(1)
-
-        # Focus on network
-        self.play(
-            self.camera.frame.animate.move_to(network).scale(0.7)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(aa_title),
-            FadeOut(network),
-            FadeOut(ff_text),
-            FadeOut(hidden_layer)
-        )
-
-    def section_2_comparison(self):
-        # Comparison points with consistent formatting
-        title = Text("Comparison", font_size=32)
-        theory = Text("• Theoretical Complexity: Similar", font_size=28)
-        practical = Text("• Practical Efficiency:", font_size=28)
-        dp_faster = Text("  - Dot-Product Attention is faster", font_size=26, color=BLUE)
-        matrix_mult = Text("  - Uses optimized matrix multiplication", font_size=26)
-
-        # Position elements with proper spacing
-        title.to_edge(UP)
-        comparison_points = VGroup(theory, practical, dp_faster, matrix_mult)
-        comparison_points.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
-        comparison_points.next_to(title, DOWN, buff=0.6)
-
-        # Group practical efficiency points
-        practical_group = VGroup(practical, dp_faster, matrix_mult)
-        practical_group.arrange(DOWN, aligned_edge=LEFT, buff=0.3)
-
-        # Animation sequence
-        self.play(
-            Write(title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(theory)
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(practical_group)
-        )
-        self.wait(1)
-
-        # Pan across points
-        self.play(
-            self.camera.frame.animate.shift(DOWN*0.5)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(title),
-            FadeOut(comparison_points)
-        )
-
-    # ===== SECTION 3 METHODS =====
-    def section_3_split_screen(self):
-        # Section title
-        section_title = Text("Scaling Dot Products for Large dk", font_size=36)
-        section_title.to_edge(UP)
-
-        # Create split screen diagrams with consistent dimensions
-        left_diagram = self.create_attention_diagram("Scaled Dot-Product", BLUE)
-        right_diagram = self.create_attention_diagram("Multi-Head", GREEN)
-
-        # Position diagrams with proper spacing
-        diagrams = VGroup(left_diagram, right_diagram).arrange(RIGHT, buff=1.5)
-        diagrams.next_to(section_title, DOWN, buff=1)
-
-        # Animation sequence
-        self.play(
-            Write(section_title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            LaggedStart(
-                FadeIn(left_diagram),
-                FadeIn(right_diagram),
-                lag_ratio=0.3
-            )
-        )
-        self.wait(1)
-
-        # Zoom on split screen
-        self.play(
-            self.camera.frame.animate.scale(0.7).move_to(diagrams)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(diagrams),
-            section_title.animate.to_edge(UP)
-        )
-
-    def section_3_matrices(self):
-        # Matrices with attention formula and consistent dimensions
-        q_matrix = self.create_matrix_label("Q", BLUE).scale(0.8)
-        k_matrix = self.create_matrix_label("K", GREEN).scale(0.8)
-        v_matrix = self.create_matrix_label("V", RED).scale(0.8)
-
-        matrices = VGroup(q_matrix, k_matrix, v_matrix).arrange(RIGHT, buff=0.8)
-
-        attention_formula = Text("Attention(Q, K, V) = softmax(QKᵀ/√dₖ)V", font_size=32)
-        attention_formula.next_to(matrices, DOWN, buff=1.0)
-
-        # Animation sequence
-        self.play(
-            LaggedStart(
-                *[Create(matrix[0]) for matrix in matrices],
-                lag_ratio=0.3
-            )
-        )
-        self.play(
-            LaggedStart(
-                *[Write(matrix[4]) for matrix in matrices],
-                lag_ratio=0.3
-            )
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(attention_formula)
-        )
-        self.wait(1)
-
-        # Focus on each element
-        for matrix in matrices:
-            self.play(
-                self.camera.frame.animate.move_to(matrix).scale(0.8)
-            )
-            self.wait(0.5)
-
-        self.play(
-            self.camera.frame.animate.move_to(attention_formula).scale(0.8)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(matrices),
-            FadeOut(attention_formula)
-        )
-
-    def section_3_scaling(self):
-        # Scaling comparison with proper spacing
-        dp_title = Text("Dot-Product Attention", font_size=30, color=BLUE)
-        aa_title = Text("Additive Attention", font_size=30, color=YELLOW)
-        scaling_factor = Text("Scaling Factor: 1/√dₖ", font_size=36)
-
-        # Position elements
-        titles = VGroup(dp_title, aa_title).arrange(LEFT, buff=2.5)
-        titles.to_edge(UP, buff=1)
-        scaling_factor.next_to(titles, DOWN, buff=1.2)
-
-        # Arrow to scaling factor (vertical only)
-        arrow = Arrow(
-            dp_title.get_center() + DOWN*0.3,
-            scaling_factor.get_center() + UP*0.3,
-            buff=0.2,
-            color=BLUE
-        )
-
-        # Animation sequence
-        self.play(
-            Write(titles)
-        )
-        self.wait(0.5)
-
-        self.play(
-            GrowArrow(arrow),
-            Write(scaling_factor)
-        )
-        self.wait(1)
-
-        # Pan between elements
-        self.play(
-            self.camera.frame.animate.shift(DOWN*0.5)
-        )
-        self.wait(0.5)
-
-        self.play(
-            self.camera.frame.animate.move_to(scaling_factor).scale(0.7)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(titles),
-            FadeOut(arrow),
-            FadeOut(scaling_factor)
-        )
-
-    def section_3_multihead(self):
-        # Multi-head attention diagram with proper spacing
-        title = Text("Multi-Head Attention", font_size=32, color=GREEN)
-        parallel_text = Text("Parallel Processing", font_size=28)
-
-        # Create multiple attention heads with consistent dimensions
-        head1 = self.create_simple_attention_head().shift(LEFT*2.5 + UP*0.8)
-        head2 = self.create_simple_attention_head().shift(UP*0.8)
-        head3 = self.create_simple_attention_head().shift(RIGHT*2.5 + UP*0.8)
-        head4 = self.create_simple_attention_head().shift(LEFT*2.5 + DOWN*0.8)
-        head5 = self.create_simple_attention_head().shift(DOWN*0.8)
-        head6 = self.create_simple_attention_head().shift(RIGHT*2.5 + DOWN*0.8)
-
-        heads = VGroup(head1, head2, head3, head4, head5, head6)
-
-        # Position elements
-        title.to_edge(UP)
-        heads.next_to(title, DOWN, buff=0.8)
-        parallel_text.next_to(heads, DOWN, buff=0.6)
-
-        # Animation sequence
-        self.play(
-            Write(title)
-        )
-        self.wait(0.5)
-
-        self.play(
-            LaggedStart(
-                *[FadeIn(head) for head in heads],
-                lag_ratio=0.2
-            )
-        )
-        self.wait(0.5)
-
-        self.play(
-            Write(parallel_text)
-        )
-        self.wait(1)
-
-        # Zoom on parallel paths
-        self.play(
-            self.camera.frame.animate.scale(0.6).move_to(heads)
-        )
-        self.wait(1)
-
-        # Cleanup
-        self.play(
-            FadeOut(title),
-            FadeOut(heads),
-            FadeOut(parallel_text)
-        )
-
-    # ===== HELPER METHODS =====
-    def create_matrix_label(self, label, color):
-        """Create a matrix representation with label and consistent dimensions."""
-        matrix = Rectangle(
-            height=1.2,
-            width=1.2,
-            color=color,
-            fill_opacity=0.1,
-            stroke_width=2
-        )
-        # Add matrix-like lines with consistent spacing
-        h_line1 = Line(
-            matrix.get_left() + UP*0.3,
-            matrix.get_right() + UP*0.3,
-            stroke_width=1,
-            color=color
-        )
-        h_line2 = Line(
-            matrix.get_left() + DOWN*0.3,
-            matrix.get_right() + DOWN*0.3,
-            stroke_width=1,
-            color=color
-        )
-        v_line = Line(
-            matrix.get_top() + LEFT*0.3,
-            matrix.get_bottom() + LEFT*0.3,
-            stroke_width=1,
-            color=color
-        )
-
-        label_text = Text(label, font_size=36, color=color).move_to(matrix)
-
-        return VGroup(matrix, h_line1, h_line2, v_line, label_text)
-
-    def create_attention_diagram(self, label, color):
-        """Create a simplified attention diagram with consistent dimensions."""
-        title = Text(label + " Attention", font_size=24, color=color)
-        rect = Rectangle(
-            height=2,
-            width=2.5,
-            color=color,
-            fill_opacity=0.1
-        )
-
-        # Add internal elements with consistent positioning
-        q_text = Text("Q", font_size=20, color=BLUE).move_to(rect.get_center() + UP*0.5 + LEFT*0.5)
-        k_text = Text("K", font_size=20, color=GREEN).move_to(rect.get_center() + UP*0.5 + RIGHT*0.5)
-        v_text = Text("V", font_size=20, color=RED).move_to(rect.get_center() + DOWN*0.5)
-
-        title.next_to(rect, UP, buff=0.2)
-        return VGroup(rect, title, q_text, k_text, v_text)
-
-    def create_simple_attention_head(self):
-        """Create a simple attention head representation with consistent dimensions."""
-        circle = Circle(radius=0.4, color=WHITE, fill_opacity=0.1)
-        q_text = Text("Q", font_size=16, color=BLUE).move_to(circle.get_center() + LEFT*0.2)
-        k_text = Text("K", font_size=16, color=GREEN).move_to(circle.get_center() + RIGHT*0.2)
-        v_text = Text("V", font_size=16, color=RED).move_to(circle.get_center() + DOWN*0.2)
-
-        return VGroup(circle, q_text, k_text, v_text)
+        self.wait(1.0)

@@ -31,6 +31,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
     for item in runtime_report.get("bbox_reports", []):
         step = item.get("step", 0)
         event = item.get("event", "")
+        block_id = item.get("block_id", "")
         report = item.get("report", {})
 
         for out_of_frame in report.get("out_of_frame", []):
@@ -40,6 +41,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="bbox",
                     severity="error",
                     message=out_of_frame.get("message", "Object is out of frame."),
@@ -54,6 +56,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="bbox",
                     severity="warning",
                     message=(
@@ -72,6 +75,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="bbox",
                     severity="warning",
                     message=containment.get("message", "Child object does not fit its container."),
@@ -86,6 +90,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="bbox",
                     severity="warning",
                     message=size_issue.get("message", "Object sizes are inconsistent."),
@@ -96,6 +101,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
     for item in runtime_report.get("layout_reports", []):
         step = item.get("step", 0)
         event = item.get("event", "")
+        block_id = item.get("block_id", "")
         for issue in item.get("issues", []):
             append_issue(
                 issues,
@@ -103,6 +109,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="layout",
                     severity=issue.get("severity", "warning"),
                     message=issue.get("message", "Layout issue."),
@@ -113,6 +120,7 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
     for item in runtime_report.get("connection_reports", []):
         step = item.get("step", 0)
         event = item.get("event", "")
+        block_id = item.get("block_id", "")
         for issue in item.get("issues", []):
             append_issue(
                 issues,
@@ -120,10 +128,11 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
                 DiagnosticIssue(
                     step=step,
                     event=event,
+                    block_id=block_id,
                     category="connection",
                     severity=issue.get("severity", "warning"),
                     message=issue.get("message", "Connection issue."),
-                    object_ids=[],
+                    object_ids=issue.get("object_ids", []),
                 ),
             )
 
@@ -132,11 +141,13 @@ def collect_issues(runtime_report: dict) -> list[DiagnosticIssue]:
 
 
 def append_issue(issues: list[DiagnosticIssue], seen_keys: set[tuple], issue: DiagnosticIssue) -> None:
-    key = (issue.category, issue.severity, issue.message, tuple(issue.object_ids))
+    key = (issue.block_id, issue.category, issue.severity, issue.message, tuple(issue.object_ids))
     if key in seen_keys:
         return
     seen_keys.add(key)
     issues.append(issue)
+
+
 def severity_rank(severity: str) -> int:
     if severity == "error":
         return 0
@@ -175,8 +186,9 @@ def build_repair_prompt(
             visible_ids = [object_id for object_id in issue.object_ids if object_id]
             if visible_ids:
                 object_suffix = f" objects={visible_ids}"
+            block_suffix = f" block={issue.block_id}" if issue.block_id else ""
             lines.append(
-                f"- step={issue.step} event={issue.event} category={issue.category} "
+                f"- step={issue.step} event={issue.event}{block_suffix} category={issue.category} "
                 f"severity={issue.severity}: {issue.message}{object_suffix}"
             )
     else:

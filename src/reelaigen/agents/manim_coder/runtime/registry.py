@@ -8,6 +8,10 @@ class ObjectRegistry:
 
     def get_id(self, mobject) -> str:
         object_id = id(mobject)
+        explicit_id = getattr(mobject, "_reelaigen_id", None)
+        if explicit_id:
+            self._ids_by_object_id[object_id] = str(explicit_id)
+            return str(explicit_id)
         if object_id not in self._ids_by_object_id:
             self._ids_by_object_id[object_id] = f"obj_{self._next_id:04d}"
             self._next_id += 1

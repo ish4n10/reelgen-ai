@@ -27,12 +27,14 @@ class SceneObjectSnapshot:
 class SceneSnapshot:
     step: int
     event: str
+    block_id: str
     objects: list[SceneObjectSnapshot]
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "step": self.step,
             "event": self.event,
+            "block_id": self.block_id,
             "objects": [obj.to_dict() for obj in self.objects],
         }
 
@@ -53,7 +55,12 @@ def capture_scene_snapshot(scene, event: str, registry: ObjectRegistry, step: in
     for mobject in getattr(scene, "mobjects", []):
         objects.append(capture_object_snapshot(mobject, registry))
 
-    return SceneSnapshot(step=step, event=event, objects=objects)
+    return SceneSnapshot(
+        step=step,
+        event=event,
+        block_id=getattr(scene, "current_runtime_block", ""),
+        objects=objects,
+    )
 
 
 def capture_object_snapshot(mobject, registry: ObjectRegistry) -> SceneObjectSnapshot:
